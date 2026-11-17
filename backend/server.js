@@ -914,7 +914,13 @@ async function brobApi(req, res, url, p, method, b) {
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json', '.webmanifest': 'application/manifest+json' };
 function serveStatic(req, res, p) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, { error: 'Méthode non autorisée' });
-  const rel = p === '/' ? '/index.html' : p === '/admin' ? '/admin.html' : p === '/client' ? '/client.html' : p === '/cockpit' ? '/cockpit.html' : p === '/badge' ? '/badge.html' : p;
+  const rel = (p === '/' || p === '/hub') ? '/hub.html'
+    : (p === '/brobrosseur' || p === '/pro') ? '/index.html'
+    : (p === '/client') ? '/client.html'
+    : (p === '/admin' || p === '/fondateur') ? '/admin.html'
+    : (p === '/cockpit') ? '/cockpit.html'
+    : (p === '/badge') ? '/badge.html'
+    : p;
   const file = path.normalize(path.join(PUBLIC_DIR, decodeURIComponent(rel)));
   if (!file.startsWith(PUBLIC_DIR) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });

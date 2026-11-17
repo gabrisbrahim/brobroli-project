@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#064e26">
+<title>Brobroli — Portail Officiel (Client · Brobrosseur · Direction)</title>
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g1: #064e26;
+  --g2: #0e8a45;
+  --g3: #2ee07f;
+  --gold: #f5a30b;
+  --bg: #f4f8f5;
+  --card: #ffffff;
+  --ink: #091d12;
+  --muted: #556e5f;
+  --line: #e1ece4;
+  --shadow: 0 16px 40px -12px rgba(6,78,38,0.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  background: linear-gradient(135deg, #04361a 0%, #064e26 50%, #0e8a45 100%);
+  color: #fff;
+  padding: 40px 20px 50px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(46,224,127,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.brand-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.brand-box img {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+.brand-box h1 {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+header p {
+  color: #cbf3d7;
+  font-size: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.45;
+}
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 14px;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+main {
+  max-width: 900px;
+  margin: -25px auto 40px;
+  padding: 0 16px;
+  width: 100%;
+  flex: 1;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.portal-card {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 24px;
+  border: 1.5px solid var(--line);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+.portal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px -10px rgba(6,78,38,0.25);
+  border-color: var(--g2);
+}
+
+.card-top {
+  margin-bottom: 20px;
+}
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+.portal-card.client .card-icon {
+  background: #eaf8ee;
+  border: 1px solid #bce8cb;
+}
+.portal-card.brob .card-icon {
+  background: #fff8eb;
+  border: 1px solid #fed89a;
+}
+.portal-card.admin .card-icon {
+  background: #0f182c;
+  border: 1px solid #233559;
+}
+
+.card-tag {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.portal-card.client .card-tag { color: var(--g1); }
+.portal-card.brob .card-tag { color: #b45309; }
+.portal-card.admin .card-tag { color: #6366f1; }
+
+.portal-card h2 {
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+.portal-card p {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.card-btn {
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 800;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
+  transition: filter 0.15s;
+}
+.portal-card.client .card-btn {
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  color: #fff;
+}
+.portal-card.brob .card-btn {
+  background: linear-gradient(135deg, #f5a30b, #d97706);
+  color: #fff;
+}
+.portal-card.admin .card-btn {
+  background: #0f182c;
+  color: #fff;
+  border: 1px solid #2a3e68;
+}
+.portal-card:hover .card-btn {
+  filter: brightness(1.08);
+}
+
+.test-strip {
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.test-strip b {
+  font-size: 14px;
+  color: var(--ink);
+}
+.test-strip span {
+  font-size: 12.5px;
+  color: var(--muted);
+  display: block;
+}
+.test-btn {
+  padding: 10px 18px;
+  background: #eef6f0;
+  color: var(--g1);
+  border: 1.5px solid var(--g2);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12.5px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-box">
+    <img src="assets/logo.jpg" alt="Brobroli">
+    <h1>Brobroli</h1>
+  </div>
+  <p>Plateforme de corvées & courses du quotidien à Abidjan · Choisissez votre espace ci-dessous</p>
+  <span class="badge-pill">📍 Cocody · Angré · Abidjan</span>
+</header>
+
+<main>
+  <div style="background:#fff;border-radius:16px;border:1px solid var(--line);padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:13.5px;color:var(--ink);box-shadow:0 4px 14px rgba(6,78,38,0.06)">
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-weight:600">
+      <input type="checkbox" id="rememberCheck" checked style="width:18px;height:18px;accent-color:var(--g1);cursor:pointer">
+      <span>Mémoriser mon choix sur cet appareil (accès direct lors des prochaines visites)</span>
+    </label>
+  </div>
+
+  <div class="portal-grid">
+    <!-- ESPACE CLIENT -->
+    <a href="/client" onclick="return selectRole(event, 'client')" class="portal-card client">
+      <div class="card-top">
+        <div class="card-icon">🛍️</div>
+        <span class="card-tag">Particulier & Entreprise</span>
+        <h2>Espace Client</h2>
+        <p>Commandez vos courses au grand marché, ménage, cuisine ou démarches. Suivez votre livreur sur le radar GPS en direct.</p>
+      </div>
+      <div class="card-btn">Commander un Brobrosseur →</div>
+    </a>
+
+    <!-- ESPACE BROBROSSEUR -->
+    <a href="/brobrosseur" onclick="return selectRole(event, 'brobrosseur')" class="portal-card brob">
+      <div class="card-top">
+        <div class="card-icon">🧑‍🔧</div>
+        <span class="card-tag">Prestataire Agréé</span>
+        <h2>Espace Brobrosseur</h2>
+        <p>Recevez vos missions en temps réel, transmettez vos tickets de caisse et encaissez 88 % net sur chaque prestation livrée.</p>
+      </div>
+      <div class="card-btn">Ouvrir mon espace livreur →</div>
+    </a>
+
+    <!-- CONSOLE FONDATEURS -->
+    <a href="/admin" onclick="return selectRole(event, 'admin')" class="portal-card admin">
+      <div class="card-top">
+        <div class="card-icon">👑</div>
+        <span class="card-tag">Direction & Supervision</span>
+        <h2>Console Fondateurs</h2>
+        <p>Gestion de la flotte, validation des certifications CNI, trésorerie et répartition automatique des bénéfices 70/30.</p>
+      </div>
+      <div class="card-btn">Accès Privé (Code secret) →</div>
+    </a>
+  </div>
+
+  <div class="test-strip">
+    <div>
+      <b>🖥️ Centre de contrôle de test (Cockpit 3-en-1)</b>
+      <span>Visualisez les 3 applications en direct côte à côte sur le même écran.</span>
+    </div>
+    <a href="/cockpit" class="test-btn">Ouvrir le Cockpit 3-en-1 ↗</a>
+  </div>
+</main>
+
+<footer>
+  © 2026 Brobroli — Tous droits réservés · Abidjan, Côte d'Ivoire
+</footer>
+
+<script>
+  (function() {
+    const p = new URLSearchParams(window.location.search);
+    if (!p.has('choose')) {
+      const saved = localStorage.getItem('brobroli_saved_role');
+      if (saved === 'client') { window.location.replace('/client'); }
+      else if (saved === 'brobrosseur') { window.location.replace('/brobrosseur'); }
+    }
+  })();
+
+  function selectRole(ev, role) {
+    const remember = document.getElementById('rememberCheck') && document.getElementById('rememberCheck').checked;
+    if (remember && role !== 'admin') {
+      localStorage.setItem('brobroli_saved_role', role);
+    } else {
+      localStorage.removeItem('brobroli_saved_role');
+    }
+    return true;
+  }
+</script>
+</body>
+</html>

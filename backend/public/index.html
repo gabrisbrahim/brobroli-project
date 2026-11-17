@@ -333,6 +333,11 @@ function renderLogin(msg) {
       <button type="button" class="btn" id="demoFill" style="margin-top:10px;height:48px;font-size:14px;background:#eef6f0;color:var(--g1);box-shadow:none;border:2px solid var(--g2)">⚡ Connexion 1-clic Démo (0700000001 / code 1234)</button>
       <button type="button" class="btn" onclick="token='standalone-demo'; me=JSON.parse(JSON.stringify(FALLBACK_BROB_ME)); render(); toast('⚡ Espace Brobrosseur ouvert en mode démo !');" style="margin-top:8px;height:42px;font-size:13px;background:none;color:var(--g1);border:1.5px dashed var(--g2);box-shadow:none">👀 Aperçu direct sans code (Mode Démo)</button>
       <div class="hint">Compte test : <b>0700000001</b> · Code : <b>1234</b> (ou créez vos Brobrosseurs dans l'Espace Fondateur).</div>
+      <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)">
+        <a href="/client" style="text-decoration:none;font-size:13px;font-weight:800;color:var(--g1)">🛍️ Vous êtes client ? Aller à l'Espace Client →</a>
+        <br>
+        <a href="/?choose=1" style="display:inline-block;margin-top:8px;text-decoration:none;font-size:11.5px;color:var(--muted)">🔄 Choisir un autre profil</a>
+      </div>
     </div>
   </div>`;
   const go = async () => {
