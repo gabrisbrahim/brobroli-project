@@ -1,0 +1,16 @@
+[
+  {
+    "id": "founder",
+    "name": "Fondateur",
+    "share": 0.7,
+    "salt": "099eaf56812da834",
+    "hash": "303dafa5aa6251113de7651d0c1de529574c0efa2fa206df030a5c6548e59470"
+  },
+  {
+    "id": "partner",
+    "name": "Associé",
+    "share": 0.3,
+    "salt": "8825f3d010b42e63",
+    "hash": "e95d600d00aa90dcb275163126f278516f16d16bf0799e6b8da9d4ce87b0a417"
+  }
+]

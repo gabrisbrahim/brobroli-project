@@ -1,0 +1,24 @@
+{
+  "name": "Brobroli — Services du Quotidien Abidjan",
+  "short_name": "Brobroli",
+  "description": "Vos courses de marché, ménage et démarches confiés à des Brobrosseurs vérifiés à Abidjan",
+  "start_url": "/cockpit",
+  "display": "standalone",
+  "background_color": "#07130b",
+  "theme_color": "#0a6b34",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/assets/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

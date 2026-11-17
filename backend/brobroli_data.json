@@ -1,0 +1,100 @@
+{
+  "users": [
+    {
+      "id": "user-client-1",
+      "phone": "0707070701",
+      "full_name": "Gabriel (Client)",
+      "role": "client",
+      "commune": "Cocody",
+      "rating": 5,
+      "missions_completed": 4,
+      "is_verified": 1,
+      "badge_level": "Client Régulier",
+      "wallet_balance": 0
+    },
+    {
+      "id": "user-brob-1",
+      "phone": "0707070702",
+      "full_name": "Aminata Koné",
+      "role": "brobrosseur",
+      "commune": "Cocody",
+      "rating": 4.9,
+      "missions_completed": 127,
+      "is_verified": 1,
+      "badge_level": "Expert",
+      "wallet_balance": 38500
+    },
+    {
+      "id": "user-brob-2",
+      "phone": "0707070703",
+      "full_name": "Kouadio Serge",
+      "role": "brobrosseur",
+      "commune": "Cocody",
+      "rating": 4.8,
+      "missions_completed": 98,
+      "is_verified": 1,
+      "badge_level": "Confirmé",
+      "wallet_balance": 14000
+    }
+  ],
+  "missions": [
+    {
+      "id": "mission-1",
+      "client_id": "user-client-1",
+      "client_name": "Gabriel (Client)",
+      "client_phone": "0707070701",
+      "brobrosseur_id": "user-brob-1",
+      "brobrosseur_name": "Aminata Koné",
+      "category": "Courses",
+      "title": "Courses fraîches au marché de Cocody",
+      "description": "Acheter légumes pour sauce graine (tomates, gombo, piment, aubergines locales).",
+      "commune": "Cocody",
+      "address_details": "Angré 8ème tranche, après la pharmacie",
+      "budget": 3500,
+      "commission": 420,
+      "escrow_fee": 250,
+      "status": "in_progress",
+      "payment_method": "orange_money",
+      "escrow_status": "held",
+      "created_at": "2026-11-15T21:06:48.868Z"
+    },
+    {
+      "id": "mission-2",
+      "client_id": "user-client-1",
+      "client_name": "Gabriel (Client)",
+      "client_phone": "0707070701",
+      "brobrosseur_id": "user-brob-1",
+      "brobrosseur_name": "Aminata Koné",
+      "category": "Ménage",
+      "title": "Nettoyage 3 pièces et repassage",
+      "description": "Nettoyage salon, cuisine, terrasse et repassage de 10 chemises.",
+      "commune": "Cocody",
+      "address_details": "Riviera Palmeraie",
+      "budget": 7000,
+      "commission": 840,
+      "escrow_fee": 250,
+      "status": "in_progress",
+      "payment_method": "wave",
+      "escrow_status": "held",
+      "created_at": "2026-11-15T21:06:48.869Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-1",
+      "mission_id": "mission-1",
+      "sender_id": "user-brob-1",
+      "sender_name": "Aminata Koné",
+      "text": "Bonjour ! Je suis arrivée au marché de Cocody, je sélectionne les tomates.",
+      "created_at": "2026-11-15T21:06:48.869Z"
+    },
+    {
+      "id": "msg-2",
+      "mission_id": "mission-1",
+      "sender_id": "user-client-1",
+      "sender_name": "Gabriel (Client)",
+      "text": "Super merci ! Pensez à prendre un peu de piment vert bien frais svp.",
+      "created_at": "2026-11-15T21:06:48.869Z"
+    }
+  ]
+}

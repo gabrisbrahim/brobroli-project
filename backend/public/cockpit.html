@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brobroli — Centre de Contrôle des 3 Interfaces (Client · Brobrosseur · Fondateurs)</title>
+<style>
+:root{--bg:#060a14;--card:#0f172a;--line:rgba(255,255,255,.1);--g:#2ee07f;--amber:#ffb020;--blue:#5b9dff;--ink:#f1f5f9;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:rgba(15,23,42,.92);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px}
+.brand img{width:38px;height:38px;border-radius:11px;border:1.5px solid var(--g);object-fit:cover}
+.brand small{display:block;font-size:11px;color:var(--g);font-weight:700}
+.modes{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.mbtn{padding:8px 15px;border-radius:12px;border:1px solid var(--line);background:#1e293b;color:var(--muted);font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;text-decoration:none}
+.mbtn.on{background:linear-gradient(135deg,#0a6b34,var(--g));color:#03200f;border-color:var(--g)}
+.stage{flex:1;display:grid;gap:12px;padding:12px;overflow:hidden}
+.stage.split{grid-template-columns:390px 390px 1fr}
+.stage.single{grid-template-columns:1fr}
+.pane{background:var(--card);border:1.5px solid var(--line);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.pane.client{border-color:rgba(91,157,255,.45)}
+.pane.brob{border-color:rgba(46,224,127,.45)}
+.pane.admin{border-color:rgba(255,176,32,.45)}
+.phead{padding:9px 14px;font-size:12.5px;font-weight:800;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);background:rgba(255,255,255,.03)}
+.phead a{color:var(--g);text-decoration:none;font-size:11.5px}
+.pane iframe{flex:1;width:100%;border:0;background:#fff}
+@media(max-width:1280px){.stage.split{grid-template-columns:1fr 1fr;overflow-y:auto}.pane{min-height:680px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="/assets/logo.jpg?v=2" alt="Brobroli">
+    <div>Brobroli · Centre des 3 Interfaces<small>Testez en direct ce que voient le Client, le Brobrosseur et les Fondateurs</small></div>
+  </div>
+  <div class="modes">
+    <button class="mbtn on" id="b-split" onclick="setMode('split')">🖥️ Voir les 3 en direct (Côte à côte)</button>
+    <button class="mbtn" id="b-client" onclick="setMode('client')">🛍️ 1. Interface Client (Particulier)</button>
+    <button class="mbtn" id="b-brob" onclick="setMode('brob')">🧑‍🔧 2. Interface Brobrosseur (Téléphone)</button>
+    <button class="mbtn" id="b-admin" onclick="setMode('admin')">👑 3. Console Privée Fondateurs (70/30)</button>
+    <a class="mbtn" href="/badge" target="_blank" style="background:#221805;border-color:#ffd700;color:#ffd700">🪪 4. Badge Officiel & QR</a>
+  </div>
+</header>
+
+<div class="stage split" id="stage">
+  <div class="pane client" id="p-client">
+    <div class="phead">
+      <span>🛍️ 1. CE QUE VOIT LE CLIENT (Particulier)</span>
+      <a href="/client" target="_blank">↗ Plein écran</a>
+    </div>
+    <iframe src="/client"></iframe>
+  </div>
+
+  <div class="pane brob" id="p-brob">
+    <div class="phead">
+      <span>🧑‍🔧 2. CE QUE VOIT LE BROBROSSEUR (Téléphone)</span>
+      <a href="/?auto=demo" target="_blank">↗ Plein écran</a>
+    </div>
+    <iframe src="/?auto=demo"></iframe>
+  </div>
+
+  <div class="pane admin" id="p-admin">
+    <div class="phead">
+      <span>👑 3. CONSOLE PRIVÉE FONDATEURS (Vous & Votre Collègue uniquement)</span>
+      <a href="/admin" target="_blank">↗ Plein écran</a>
+    </div>
+    <iframe src="/admin"></iframe>
+  </div>
+</div>
+
+<script>
+if (location.protocol === 'file:') {
+  const pc = document.querySelector('#p-client iframe'); if (pc) pc.src = 'client.html';
+  const pca = document.querySelector('#p-client a'); if (pca) pca.href = 'client.html';
+  const pb = document.querySelector('#p-brob iframe'); if (pb) pb.src = 'index.html?auto=demo';
+  const pba = document.querySelector('#p-brob a'); if (pba) pba.href = 'index.html?auto=demo';
+  const pa = document.querySelector('#p-admin iframe'); if (pa) pa.src = 'admin.html';
+  const paa = document.querySelector('#p-admin a'); if (paa) paa.href = 'admin.html';
+}
+
+function setMode(m) {
+  document.querySelectorAll('.mbtn').forEach((b) => b.classList.remove('on'));
+  document.getElementById('b-' + m).classList.add('on');
+  const st = document.getElementById('stage');
+  const pc = document.getElementById('p-client');
+  const pb = document.getElementById('p-brob');
+  const pa = document.getElementById('p-admin');
+  if (m === 'split') {
+    st.className = 'stage split';
+    pc.style.display = pb.style.display = pa.style.display = 'flex';
+  } else {
+    st.className = 'stage single';
+    pc.style.display = m === 'client' ? 'flex' : 'none';
+    pb.style.display = m === 'brob' ? 'flex' : 'none';
+    pa.style.display = m === 'admin' ? 'flex' : 'none';
+  }
+}
+</script>
+</body>
+</html>
+

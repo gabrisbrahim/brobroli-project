@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brobroli — Affiche Officielle de Lancement (Abidjan)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Cabinet+Grotesk:wght@800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+    .font-display { font-family: 'Cabinet Grotesk', sans-serif; }
+    body {
+      background: radial-gradient(circle at 50% 20%, #0f2b1a, #060b14 80%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      color: #fff;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .tool-btn {
+      background: #11281c;
+      border: 1px solid rgba(46, 224, 127, 0.4);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.15s;
+    }
+    .tool-btn:hover {
+      background: #1a422d;
+      border-color: #2ee07f;
+    }
+
+    .poster {
+      width: 100%;
+      max-width: 500px;
+      background: #0b1522;
+      border-radius: 36px;
+      border: 1.5px solid rgba(46, 224, 127, 0.35);
+      box-shadow: 0 30px 90px -20px rgba(0, 0, 0, 0.95), 0 0 50px -10px rgba(34, 197, 94, 0.25);
+      position: relative;
+      overflow: hidden;
+      padding: 28px 24px;
+    }
+
+    .badge-pill {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      backdrop-filter: blur(8px);
+    }
+
+    .card-service {
+      background: rgba(15, 27, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 20px;
+      gap: 12px;
+    }
+    .card-service:hover {
+      border-color: rgba(34, 197, 94, 0.5);
+      transform: translateY(-2px);
+      background: rgba(20, 36, 52, 0.9);
+    }
+
+    .glow-dot {
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
+    }
+
+    .qr-box {
+      width: 72px;
+      height: 72px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 5px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+    .qr-box svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    @media print {
+      body {
+        background: #fff !important;
+        padding: 0 !important;
+        color: #000 !important;
+      }
+      .toolbar { display: none !important; }
+      .poster {
+        border: none !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        background: #0b1522 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="tool-btn" onclick="window.print()">🖨️ Imprimer l'Affiche (Format A4 / Flyer)</button>
+  <a class="tool-btn" href="http://localhost:5000/client" target="_blank">🛍️ Tester l'App Client</a>
+  <a class="tool-btn" href="http://localhost:5000/cockpit" target="_blank">🖥️ Centre 3-en-1</a>
+  <a class="tool-btn" href="10_Badge_Officiel_Brobrosseur.html" target="_blank">🪪 Badge Officiel</a>
+</div>
+
+<div class="poster text-white relative">
+  <!-- Glow d'ambiance en arrière-plan -->
+  <div class="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Header : Logo + Ville -->
+  <div class="flex justify-between items-center mb-5 relative z-10">
+    <div class="flex items-center gap-3">
+      <img src="Visuels_et_Logo/logo.jpg" onerror="this.onerror=null;this.src='/assets/logo.jpg';this.onerror=function(){this.src='backend/public/assets/logo.jpg'};" alt="Logo Brobroli" class="w-12 h-12 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg shadow-emerald-950">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-display font-black tracking-tight text-white leading-none">Brobroli</h1>
+          <span class="text-[9px] font-extrabold uppercase tracking-widest text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/40">Officiel</span>
+        </div>
+        <p class="text-xs text-slate-300 font-medium mt-0.5">Vos courses & corvées du quotidien à Abidjan</p>
+      </div>
+    </div>
+    <div class="text-right">
+      <span class="badge-pill px-3 py-1.5 rounded-full text-[11px] font-bold text-emerald-300 flex items-center gap-1.5 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 glow-dot animate-pulse"></span>
+        Cocody · Angré
+      </span>
+    </div>
+  </div>
+
+  <!-- Grand Titre / Proposition de Valeur Immédiate -->
+  <div class="mb-5 relative z-10">
+    <h2 class="text-2xl font-display font-black text-white leading-[1.2] mb-2">
+      Ne perdez plus votre samedi dans les corvées. <br>
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-green-300 to-amber-300">
+        On s'en charge pour vous.
+      </span>
+    </h2>
+    <p class="text-xs text-slate-300 leading-relaxed font-normal">
+      Confiez vos courses de marché, ménage et démarches à un <strong>Brobrosseur vérifié CNI</strong> de votre quartier. Zéro déplacement dans les embouteillages.
+    </p>
+  </div>
+
+  <!-- Photo Hero Brobrosseur Abidjan -->
+  <div class="mb-5 rounded-2xl overflow-hidden border border-emerald-500/30 relative h-36 shadow-lg z-10">
+    <img src="Visuels_et_Logo/hero.jpg" onerror="this.onerror=null;this.src='/assets/hero.jpg';this.onerror=function(){this.src='backend/public/assets/hero.jpg'};" alt="Brobrosseur Abidjan" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent flex items-end p-3">
+      <span class="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+        🛡️ Jeunes vérifiés de votre commune · Suivi GPS en temps réel
+      </span>
+    </div>
+  </div>
+
+  <!-- Comment ça marche (3 étapes visuelles ultra claires) -->
+  <div class="grid grid-cols-3 gap-2 mb-5 p-3 rounded-2xl bg-slate-900/70 border border-slate-800 text-center relative z-10">
+    <div>
+      <div class="text-base mb-0.5">1️⃣</div>
+      <div class="text-[11px] font-bold text-white">Commandez</div>
+      <div class="text-[9px] text-slate-400">En 1 minute chrono</div>
+    </div>
+    <div class="border-x border-slate-800 px-1">
+      <div class="text-base mb-0.5">2️⃣</div>
+      <div class="text-[11px] font-bold text-white">Suivez en direct</div>
+      <div class="text-[9px] text-slate-400">Position GPS exacte</div>
+    </div>
+    <div>
+      <div class="text-base mb-0.5">3️⃣</div>
+      <div class="text-[11px] font-bold text-white">Validez & Payez</div>
+      <div class="text-[9px] text-emerald-400 font-bold">Séquestre Wave/OM</div>
+    </div>
+  </div>
+
+  <!-- Les 3 Services Phares avec Tarifs Clairs & Photos Réelles -->
+  <div class="space-y-2.5 mb-5 relative z-10">
+    
+    <!-- Service 1 : Marché -->
+    <div class="card-service">
+      <div class="flex items-center gap-3">
+        <img src="Visuels_et_Logo/cat-marche.jpg" onerror="this.onerror=null;this.src='/assets/cat-marche.jpg';" alt="Marché" class="w-12 h-12 rounded-xl object-cover border border-emerald-500/40 flex-shrink-0">
+        <div>
+          <h3 class="font-bold text-white text-xs">Courses au Grand Marché</h3>
+          <p class="text-[11px] text-slate-400">Vivres frais sélectionnés : tomates, gombo, poisson</p>
+        </div>
+      </div>
+      <div class="text-right pl-2 flex-shrink-0">
+        <div class="text-base font-display font-black text-amber-400">5 000 F</div>
+        <div class="text-[8.5px] uppercase tracking-wider text-slate-400 font-bold">Forfait Net</div>
+      </div>
+    </div>
+
+    <!-- Service 2 : Ménage -->
+    <div class="card-service">
+      <div class="flex items-center gap-3">
+        <img src="Visuels_et_Logo/cat-menage.jpg" onerror="this.onerror=null;this.src='/assets/cat-menage.jpg';" alt="Ménage" class="w-12 h-12 rounded-xl object-cover border border-emerald-500/40 flex-shrink-0">
+        <div>
+          <h3 class="font-bold text-white text-xs">Ménage Courant & Repassage</h3>
+          <p class="text-[11px] text-slate-400">Entretien 2 à 3 pièces ou lot de 10-12 tenues</p>
+        </div>
+      </div>
+      <div class="text-right pl-2 flex-shrink-0">
+        <div class="text-base font-display font-black text-amber-400">6 000 F</div>
+        <div class="text-[8.5px] uppercase tracking-wider text-slate-400 font-bold">Forfait Net</div>
+      </div>
+    </div>
+
+    <!-- Service 3 : Cuisine / Démarches -->
+    <div class="card-service">
+      <div class="flex items-center gap-3">
+        <img src="Visuels_et_Logo/cat-cuisine.jpg" onerror="this.onerror=null;this.src='/assets/cat-cuisine.jpg';" alt="Cuisine" class="w-12 h-12 rounded-xl object-cover border border-emerald-500/40 flex-shrink-0">
+        <div>
+          <h3 class="font-bold text-white text-xs">Plis Express & Files d'Attente</h3>
+          <p class="text-[11px] text-slate-400">Agence CIE / SODECI, retrait colis, démarches</p>
+        </div>
+      </div>
+      <div class="text-right pl-2 flex-shrink-0">
+        <div class="text-base font-display font-black text-amber-400">4 000 F</div>
+        <div class="text-[8.5px] uppercase tracking-wider text-slate-400 font-bold">Forfait Net</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bloc Réassurance / Confiance Absolue -->
+  <div class="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/90 to-slate-900 border border-emerald-500/30 flex items-center gap-3 mb-5 relative z-10">
+    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-lg flex-shrink-0">
+      🛡️
+    </div>
+    <div class="text-[11.5px] leading-snug text-slate-200">
+      <strong class="text-white">Confiance 100% Garantie :</strong> Tous nos Brobrosseurs portent un badge avec CNI et casier vérifiés. <em>Vous ne libérez le paiement qu'après vérification à votre porte.</em>
+    </div>
+  </div>
+
+  <!-- Bloc QR Code + Bouton Commande Directe -->
+  <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-between gap-3 mb-4 relative z-10">
+    <div class="qr-box">
+      <!-- QR code vectoriel scannable pour ouvrir l'application client -->
+      <svg viewBox="0 0 100 100" fill="#07190e">
+        <rect x="8" y="8" width="30" height="30" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+        <rect x="17" y="17" width="12" height="12" fill="#07190e"/>
+        <rect x="62" y="8" width="30" height="30" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+        <rect x="71" y="17" width="12" height="12" fill="#07190e"/>
+        <rect x="8" y="62" width="30" height="30" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+        <rect x="17" y="71" width="12" height="12" fill="#07190e"/>
+        <rect x="44" y="12" width="10" height="18" rx="2"/>
+        <rect x="44" y="38" width="12" height="10" rx="2"/>
+        <rect x="62" y="44" width="18" height="10" rx="2"/>
+        <rect x="44" y="58" width="10" height="30" rx="2"/>
+        <rect x="62" y="62" width="12" height="12" rx="2"/>
+        <rect x="80" y="62" width="10" height="26" rx="2"/>
+      </svg>
+    </div>
+    <div class="flex-1">
+      <b class="text-xs text-white block">Scannez pour commander en 30s</b>
+      <p class="text-[10px] text-slate-300 mt-0.5 leading-snug">Ouvrez l'appareil photo de votre téléphone pour commander immédiatement votre Brobrosseur.</p>
+    </div>
+  </div>
+
+  <!-- Bouton d'Action & Contact WhatsApp -->
+  <div class="text-center relative z-10">
+    <a href="https://wa.me/2250708091011?text=Bonjour%20Brobroli%2C%20je%20souhaite%20commander%20une%20prestation" target="_blank" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-400 text-slate-950 font-display font-black text-sm shadow-xl shadow-emerald-950/80 flex items-center justify-center gap-2 cursor-pointer hover:opacity-95 transition no-underline">
+      <span>💬</span> Commander sur WhatsApp : 07 08 09 10 11
+    </a>
+    <div class="flex items-center justify-center gap-3 mt-2.5 text-[11px] text-slate-400 font-semibold">
+      <span>Séquestre garanti :</span>
+      <span class="text-blue-400 font-bold flex items-center gap-1">● Wave</span>
+      <span class="text-orange-400 font-bold flex items-center gap-1">● Orange Money</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

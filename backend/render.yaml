@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: brobroli-app
+    env: node
+    plan: free
+    buildCommand: "echo 'Zero-dependency pure Node.js build ready'"
+    startCommand: "node server.js"
+    envVars:
+      - key: PORT
+        value: 10000

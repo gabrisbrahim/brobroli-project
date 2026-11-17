@@ -1,0 +1,15 @@
+{
+  "name": "Brobroli — Espace Brobrosseur",
+  "short_name": "Brobrosseur",
+  "description": "Application mobile des Brobrosseurs certifiés : missions, GPS, chat et gains nets (88%).",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e1f16",
+  "theme_color": "#0a6b34",
+  "icons": [
+    { "src": "/assets/logo.jpg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any maskable" },
+    { "src": "/assets/logo.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
+  ]
+}

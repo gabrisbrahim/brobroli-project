@@ -1,0 +1,754 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#064e26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest-brobrosseur.json">
+<link rel="apple-touch-icon" href="assets/logo.jpg">
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<title>Brobroli — Espace Brobrosseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g1:#064e26; --g2:#0e8a45; --g3:#2ee07f; --amber:#f5a30b; --red:#e53935;
+  --bg:#f3f7f4; --card:#fff; --ink:#091d12; --muted:#556e5f; --line:#e1ece4;
+  --shadow-sm:0 4px 12px rgba(9,29,18,.06);
+  --shadow:0 12px 32px -8px rgba(6,78,38,.18);
+  --shadow-lg:0 20px 48px -12px rgba(6,78,38,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+
+
+#app{max-width:480px;margin:0 auto;min-height:100%;position:relative;background:var(--bg)}
+button{font:inherit;cursor:pointer;border:0}
+input{font:inherit}
+
+/* ── Connexion ── */
+.login{min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(165deg,#04361a 0%,#085c2e 60%,#0f8a45 100%);color:#fff;padding:0 24px calc(24px + env(safe-area-inset-bottom))}
+.login .top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:28px}
+.logo{width:96px;height:96px;border-radius:26px;background:#fff;display:grid;place-items:center;font-size:50px;box-shadow:0 18px 40px -12px rgba(0,0,0,.45);margin-bottom:14px;overflow:hidden;border:3px solid rgba(255,255,255,.9)}
+.logo img{width:100%;height:100%;object-fit:cover;display:block}
+.herobanner{width:100%;height:136px;border-radius:22px;overflow:hidden;position:relative;margin:14px 0 8px;box-shadow:0 14px 32px -12px rgba(0,0,0,.38);border:2px solid rgba(255,255,255,.25)}
+.herobanner img{width:100%;height:100%;object-fit:cover;display:block}
+.herobanner .ov{position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,38,19,.92) 0%,rgba(4,38,19,.28) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px;text-align:left;color:#fff}
+.herobanner .ov b{font-size:16px;font-weight:900;line-height:1.25}
+.herobanner .ov span{font-size:12.5px;opacity:.92;margin-top:3px;color:#cbf3d7}
+.catstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.catpic{position:relative;height:80px;border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);border:1.5px solid var(--line)}
+.catpic img{width:100%;height:100%;object-fit:cover;display:block}
+.catpic span{position:absolute;inset:0;background:linear-gradient(180deg,transparent 20%,rgba(4,32,16,.88) 100%);color:#fff;font-size:11.5px;font-weight:800;display:flex;align-items:flex-end;padding:7px 9px;line-height:1.15}
+.login h1{font-size:32px;font-weight:900;letter-spacing:-.5px}
+.login .tag{opacity:.92;margin-top:6px;font-size:14.5px;color:#cbf3d7}
+.login .form{background:#fff;color:var(--ink);border-radius:28px;padding:24px;box-shadow:0 24px 50px -16px rgba(0,0,0,.45)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.field input{width:100%;height:54px;border:2px solid var(--line);border-radius:16px;padding:0 16px;font-size:18px;font-weight:700;outline:none;background:#fafcfb;transition:border-color .15s}
+.field input:focus{border-color:var(--g2);background:#fff}
+.btn{width:100%;height:54px;border-radius:16px;font-weight:800;font-size:16px;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2));box-shadow:0 8px 20px -6px rgba(14,138,69,.5);transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.6}
+.err{color:var(--red);font-weight:700;font-size:13.5px;min-height:20px;margin-bottom:8px;text-align:center}
+.hint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.4}
+
+/* ── App Layout ── */
+.hero{background:linear-gradient(165deg,#04361a 0%,#085c2e 60%,#0f8a45 100%);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 20px 68px;border-radius:0 0 34px 34px;box-shadow:var(--shadow-lg)}
+.hero .row{display:flex;align-items:center;justify-content:space-between}
+.hello{font-size:13.5px;opacity:.9;color:#cbf3d7;font-weight:600}
+.who{font-size:23px;font-weight:900;letter-spacing:-.3px}
+.online{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.18);backdrop-filter:blur(10px);padding:8px 14px;border-radius:999px;font-weight:800;font-size:12.5px;border:1px solid rgba(255,255,255,.25)}
+.dot{width:9px;height:9px;border-radius:50%;background:#2ee07f;box-shadow:0 0 10px #2ee07f;animation:pulse 1.8s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(46,224,127,0)}100%{box-shadow:0 0 0 0 rgba(46,224,127,0)}}
+.content{padding:0 16px 120px;margin-top:-48px}
+.card{background:var(--card);border-radius:24px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px;border:1px solid var(--line)}
+.card h3{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
+
+/* ── Ergonomic Action Hero Card ── */
+.action-hero{background:linear-gradient(145deg,#064e26,#0e8a45);color:#fff;border-radius:24px;padding:22px;box-shadow:var(--shadow-lg);margin-bottom:14px;border:2px solid rgba(255,255,255,.2);position:relative;overflow:hidden}
+.action-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:220px;height:220px;background:radial-gradient(circle,rgba(46,224,127,.2) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.action-hero .subtag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.22);backdrop-filter:blur(6px);padding:5px 12px;border-radius:99px;font-size:11.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px}
+.action-hero .act-title{font-size:22px;font-weight:900;line-height:1.25;margin-bottom:4px}
+.action-hero .act-desc{font-size:14px;opacity:.92;margin-bottom:16px;line-height:1.35;color:#cbf3d7}
+.action-hero .btn-do{width:100%;height:62px;border-radius:18px;background:#f5a30b;color:#072111;font-size:18px;font-weight:900;box-shadow:0 10px 25px -6px rgba(245,163,11,.6);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}
+.action-hero .btn-do:active{transform:scale(.98)}
+
+/* ── Vivres Budget Badge ── */
+.vivres-card{background:linear-gradient(135deg,#f0faf3,#e5f7ec);border:1.5px solid #2ee07f;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.vivres-card .vhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.vivres-card .vhead span{font-size:12px;font-weight:900;color:var(--g1);text-transform:uppercase;letter-spacing:.6px}
+.vivres-card .vhead b{font-size:22px;font-weight:900;color:var(--g1)}
+.vivres-card p{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.vivres-card .vmode{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #c2eccf;padding:5px 11px;border-radius:10px;font-size:11.5px;font-weight:800;color:var(--g1)}
+
+/* ── Contact Buttons (Direct Call & WhatsApp) ── */
+.contact-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.contact-btn{height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:14px;text-decoration:none;transition:transform .1s}
+.contact-btn:active{transform:scale(.98)}
+.contact-btn.call{background:#eaf1ff;color:#2457d6;border:1.5px solid #c5d8ff}
+.contact-btn.wa{background:#e7f8ee;color:#0a8a42;border:1.5px solid #b6e8c7}
+
+/* ── Live In-App Chat ── */
+.chat-box{background:#f8faf9;border-radius:20px;border:1.5px solid var(--line);padding:15px;margin-bottom:14px}
+.chat-head{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.chat-msgs{max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;padding-right:2px}
+.cmsg{padding:8px 12px;border-radius:12px;font-size:13px;max-width:85%;line-height:1.35}
+.cmsg.brob{background:var(--g1);color:#fff;align-self:flex-end}
+.cmsg.client{background:#e6efe8;color:var(--ink);align-self:flex-start}
+.cmsg.system{background:#fff;border:1px solid var(--line);font-size:11px;color:var(--muted);align-self:center;text-align:center}
+.quick-replies{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;-webkit-overflow-scrolling:touch}
+.qr-chip{padding:6px 12px;background:#fff;border:1px solid #cfe0d4;border-radius:99px;font-size:12px;font-weight:800;color:var(--g1);white-space:nowrap;cursor:pointer}
+.qr-chip:active{background:#e9f8ef}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row input{flex:1;height:44px;border:2px solid var(--line);border-radius:14px;padding:0 14px;font-size:14px;background:#fff;outline:none;transition:border-color .15s}
+.chat-input-row input:focus{border-color:var(--g2)}
+.chat-input-row button{height:44px;padding:0 18px;border-radius:14px;background:var(--g1);color:#fff;font-weight:800;font-size:14px}
+
+/* ── Steps Progress ── */
+.progress{height:8px;background:#e2ece5;border-radius:99px;overflow:hidden;margin:2px 0 16px}
+.progress div{height:100%;background:linear-gradient(90deg,var(--g2),var(--g3));border-radius:99px;transition:width .5s}
+.steps{position:relative}
+.step{display:flex;gap:14px;align-items:flex-start;padding-bottom:16px;position:relative}
+.step:last-child{padding-bottom:0}
+.step:not(:last-child)::before{content:"";position:absolute;left:17px;top:36px;bottom:0;width:3px;background:#e5efe8;border-radius:3px}
+.step.done:not(:last-child)::before{background:var(--g2)}
+.bub{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:17px;flex:none;background:#eef3ef;color:#9db0a4;font-weight:800;z-index:1}
+.step.done .bub{background:var(--g2);color:#fff}
+.step.cur .bub{background:var(--amber);color:#fff;animation:glow 1.6s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(245,163,11,.6)}50%{box-shadow:0 0 0 9px rgba(245,163,11,0)}}
+.stxt{padding-top:6px;font-weight:800;font-size:15px}
+.step.todo .stxt{color:#a6b6ac;font-weight:600}
+.stime{font-size:12px;color:var(--muted);font-weight:600;margin-top:1px}
+
+/* ── Floating Sticky CTA ── */
+.cta{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom));z-index:5;margin:6px 0 14px}
+.cta .btn{height:64px;font-size:17px;background:linear-gradient(135deg,#f5a30b,#ff7a18);box-shadow:0 12px 28px -8px rgba(255,122,24,.6)}
+.cta .btn.green{background:linear-gradient(135deg,var(--g1),var(--g2));box-shadow:var(--shadow)}
+
+/* ── GPS & SOS ── */
+.gps{display:flex;gap:12px;align-items:center}
+.gpsi{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:#e9f8ef;flex:none}
+.gps.warn .gpsi{background:#fff3dc}.gps.bad .gpsi{background:#ffe8e8}
+.gpst b{display:block;font-size:14.5px;font-weight:800}
+.gpst span{font-size:12.5px;color:var(--muted)}
+.sos{width:100%;height:50px;border-radius:16px;background:#fff0f0;color:var(--red);font-weight:800;border:2px solid #ffd0d0;font-size:14.5px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+.empty{text-align:center;padding:32px 14px}
+.empty .big{font-size:64px;margin-bottom:10px}
+.empty h2{font-size:21px;font-weight:900;margin-bottom:6px}
+.empty p{color:var(--muted);font-size:14.5px}
+
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border-radius:22px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.kpi span{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.kpi b{display:block;font-size:24px;font-weight:900;margin-top:4px}
+.kpi.main{grid-column:span 2;background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff}
+.kpi.main span{color:rgba(255,255,255,.85)}.kpi.main b{font-size:32px}
+.hrow{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.hrow:last-child{border:0}
+.hrow .hi{font-size:24px}.hrow b{margin-left:auto;color:var(--g1);font-weight:900}
+.hrow small{display:block;color:var(--muted);font-size:12px}
+
+/* ── PWA Install Pill ── */
+.pwa-pill{display:none;background:#e9f8ef;border:1.5px solid #2ee07f;color:var(--g1);border-radius:14px;padding:10px 14px;margin-bottom:12px;align-items:center;justify-content:space-between;font-size:13px;font-weight:800}
+
+/* ── Bottom Tabs ── */
+.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:20}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;background:none;color:#809587;font-weight:800;font-size:11.5px;border-radius:14px;transition:all .15s}
+.tab i{font-style:normal;font-size:22px}
+.tab.on{color:var(--g1);background:#e8f7ee}
+
+#sheet{position:fixed;inset:0;background:rgba(6,22,13,.6);display:none;align-items:flex-end;justify-content:center;z-index:50;backdrop-filter:blur(4px)}
+#sheet.show{display:flex}
+.sheet{width:100%;max-width:480px;background:#fff;border-radius:30px 30px 0 0;padding:24px 22px calc(24px + env(safe-area-inset-bottom));animation:up .22s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet h2{font-size:21px;font-weight:900;margin-bottom:6px}.sheet p{color:var(--muted);margin-bottom:16px}
+.sheet .btn{margin-bottom:10px}.btn.ghost{background:#eef3ef;color:var(--ink);box-shadow:none}.btn.red{background:var(--red)}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%) translateY(-90px);background:#091d12;color:#fff;padding:13px 20px;border-radius:16px;font-weight:800;z-index:99;transition:transform .3s;max-width:92%;text-align:center;font-size:14px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+#toast.show{transform:translateX(-50%) translateY(0)}#toast.err{background:var(--red)}
+.party{font-size:68px;text-align:center;animation:pop .5s}@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheet"></div>
+<div id="toast"></div>
+<input type="file" id="cam" accept="image/*" capture="environment" hidden>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fcfa = (n) => Number(n || 0).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ') + ' F';
+const hhmm = (t) => new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+const API_BASE = location.protocol === 'file:' ? 'http://localhost:5000' : '';
+const FALLBACK_BROB_ME = {
+  profile: {
+    name: 'Aminata Koné', phone: '0700000001', badge: '🏆 Expert Agréé', rating: 4.9, verified: true,
+    matricule: 'CI-BROB-2026-0042',
+    certifications: ['cni', 'casier', 'garant', 'expert_marche', 'top_rated', 'ponctualite']
+  },
+  mission: {
+    id: 'm-demo-1', ref: 'BR-0102', service_name: 'Courses au grand marché', icon: '🛒', kind: 'courses',
+    description: '2 tas de tomates fraîches, gombo, 500 F de piment vert, poisson fumé',
+    client_first: 'Mme Koné', client_name: 'Mme Koné (Angré)', client_phone: '0708091011',
+    address: 'Cocody Angré 8e tranche', landmark: 'Après le carrefour Bluetooth, portail vert',
+    brob_net: 4400, status: 'in_progress', step: 1,
+    budget_vivres: 10000, payment_method: 'wave',
+    chat_messages: [{ sender: 'system', text: 'Mission assignée · Budget vivres : 10 000 F' }],
+    steps: [
+      { key: 'accepted', icon: '✅', label: 'Mission acceptée', action: "J'accepte la mission" },
+      { key: 'enroute', icon: '🚶', label: 'En route vers le marché', action: 'Je pars vers le marché' },
+      { key: 'arrived', icon: '🏪', label: 'Arrivé au marché', action: 'Je suis arrivé au marché' },
+      { key: 'working', icon: '🛒', label: 'Achats en cours', action: 'Je commence les achats' },
+      { key: 'receipt', icon: '🧾', label: 'Achats terminés', action: 'Achats terminés — photo du ticket', photo: true },
+      { key: 'delivering', icon: '🏠', label: 'En route chez le client', action: 'Je pars chez le client' },
+      { key: 'delivered', icon: '🎉', label: 'Livré au client', action: 'Courses remises au client' }
+    ],
+    steps_log: [{ key: 'accepted', at: Date.now() - 300000 }],
+    maps_url: 'https://www.google.com/maps/dir/?api=1&destination=5.3610,-3.9840'
+  },
+  queue: 0,
+  wallet: { pending: 18480, earned: 42240, missions: 9, awaiting: 4400 },
+  recent: [
+    { ref: 'BR-0101', service_name: 'Courses au grand marché', icon: '🛒', brob_net: 4400, at: Date.now() - 86400000 },
+    { ref: 'BR-0098', service_name: 'Ménage courant (2-3 pièces)', icon: '🧹', brob_net: 5280, at: Date.now() - 172800000 }
+  ],
+  support_phone: '0708091011'
+};
+
+let token = localStorage.getItem('bro_brob');
+let me = null, tab = 'mission', sig = '', busy = false;
+let lastMissionId = null;
+
+/* ── PWA Service Worker ── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const p = $('#pwaPill');
+  if (p) p.style.display = 'flex';
+});
+
+/* ── Web Audio Synthesizer Chime ── */
+function playMissionChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    const freqs = [523.25, 659.25, 783.99, 1046.50];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, now + i * 0.11);
+      gain.gain.setValueAtTime(0.28, now + i * 0.11);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * 0.11);
+      osc.stop(now + i * 0.11 + 0.36);
+    });
+  } catch (e) {}
+}
+
+function speakAudio(text) {
+  try {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR'; u.rate = 1.05;
+      window.speechSynthesis.speak(u);
+    }
+  } catch(e) {}
+}
+
+function notifyNewMission() {
+  playMissionChime();
+  if (navigator.vibrate) navigator.vibrate([350, 120, 350, 120, 500]);
+  speakAudio('Nouvelle mission assignée ! Touchez votre écran pour démarrer.');
+}
+
+
+/* ── API ── */
+async function api(path, opts = {}) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), 2000);
+  try {
+    const r = await fetch(API_BASE + path, {
+      method: opts.method || 'GET',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      signal: ctrl.signal
+    });
+    clearTimeout(tid);
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 401 && token && token !== 'standalone-demo') { logout(); throw new Error(j.error || 'Session expirée'); }
+    if (!r.ok) throw new Error(j.error || 'Erreur réseau');
+    return j;
+  } catch(e) {
+    clearTimeout(tid);
+    throw e;
+  }
+}
+
+function toast(msg, err) {
+  const t = $('#toast'); t.textContent = msg; t.className = 'show' + (err ? ' err' : '');
+  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ''), 3200);
+}
+function sheet(html) { $('#sheet').innerHTML = `<div class="sheet">${html}</div>`; $('#sheet').className = 'show'; }
+function closeSheet() { $('#sheet').className = ''; }
+
+/* ── Connexion ── */
+function renderLogin(msg) {
+  $('#app').innerHTML = `
+  <div class="login">
+    <div class="top">
+      <div class="logo"><img src="assets/logo.jpg?v=3" alt="Brobroli"></div>
+      <h1>Espace Brobrosseur</h1>
+      <div class="tag">Plateforme officielle des prestataires d'Abidjan</div>
+      <div class="herobanner">
+        <img src="assets/hero.jpg" alt="Brobrosseur">
+        <div class="ov">
+          <b>Gagnez 88 % net sur chaque mission</b>
+          <span>Courses au marché · Ménage · Cuisine · Express à Cocody</span>
+        </div>
+      </div>
+    </div>
+    <div class="form">
+      <div class="field"><label>Votre téléphone</label><input id="ph" type="tel" inputmode="numeric" placeholder="07 07 07 07 07" autocomplete="tel"></div>
+      <div class="field"><label>Votre code secret (4 chiffres)</label><input id="cd" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="current-password"></div>
+      <div class="err" id="er">${esc(msg || '')}</div>
+      <button class="btn" id="go">Me connecter</button>
+      <button type="button" class="btn" id="demoFill" style="margin-top:10px;height:48px;font-size:14px;background:#eef6f0;color:var(--g1);box-shadow:none;border:2px solid var(--g2)">⚡ Connexion 1-clic Démo (0700000001 / code 1234)</button>
+      <button type="button" class="btn" onclick="token='standalone-demo'; me=JSON.parse(JSON.stringify(FALLBACK_BROB_ME)); render(); toast('⚡ Espace Brobrosseur ouvert en mode démo !');" style="margin-top:8px;height:42px;font-size:13px;background:none;color:var(--g1);border:1.5px dashed var(--g2);box-shadow:none">👀 Aperçu direct sans code (Mode Démo)</button>
+      <div class="hint">Compte test : <b>0700000001</b> · Code : <b>1234</b> (ou créez vos Brobrosseurs dans l'Espace Fondateur).</div>
+    </div>
+  </div>`;
+  const go = async () => {
+    $('#er').textContent = ''; $('#go').disabled = true;
+    try {
+      const r = await api('/api/brob/login', { method: 'POST', body: { phone: $('#ph').value, code: $('#cd').value } });
+      token = r.token; localStorage.setItem('bro_brob', token); await refresh(true);
+    } catch (e) {
+      if ($('#ph').value.replace(/\D/g, '') === '0700000001' || $('#cd').value === '1234') {
+        token = 'standalone-demo'; me = JSON.parse(JSON.stringify(FALLBACK_BROB_ME)); render();
+      } else {
+        $('#er').textContent = e.message;
+      }
+    } finally { const b = $('#go'); if (b) b.disabled = false; }
+  };
+  $('#go').onclick = go; $('#cd').onkeydown = (e) => { if (e.key === 'Enter') go(); };
+  $('#demoFill').onclick = () => { $('#ph').value = '0700000001'; $('#cd').value = '1234'; go(); };
+  if (new URLSearchParams(location.search).get('auto') === 'demo' || location.protocol === 'file:') { $('#ph').value = '0700000001'; $('#cd').value = '1234'; go(); }
+}
+function logout() { token = null; me = null; localStorage.removeItem('bro_brob'); stopGps(); renderLogin(); }
+
+/* ── Données ── */
+async function refresh(force) {
+  if (!token) return renderLogin();
+  try {
+    me = await api('/api/brob/me');
+    const m = me.mission;
+
+    if (m && m.id !== lastMissionId && m.status !== 'delivered' && m.status !== 'completed') {
+      if (lastMissionId !== null) {
+        notifyNewMission();
+      }
+      lastMissionId = m.id;
+    } else if (!m) {
+      lastMissionId = null;
+    }
+
+    const s = JSON.stringify([m && [m.id, m.step, m.status, (m.chat_messages || []).length], me.wallet, me.queue, tab]);
+    if (force || s !== sig) { sig = s; render(); }
+    if (m && m.status !== 'delivered') startGps(); else stopGps();
+  } catch (e) {
+    if (!me) { me = JSON.parse(JSON.stringify(FALLBACK_BROB_ME)); render(); }
+    else if (force) render();
+  }
+}
+setInterval(() => { if (token && !busy) refresh(); }, 4000);
+
+/* ── GPS ── */
+const gps = { timer: null, state: 'off', last: null, sentAt: 0 };
+function startGps() {
+  if (gps.timer) return;
+  const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+  if (!('geolocation' in navigator)) gps.state = 'unsupported';
+  else if (!window.isSecureContext && !local) gps.state = 'insecure';
+  else { gps.state = 'searching'; gps.timer = setInterval(poll, 6000); poll(); lockScreen(); }
+  paintGps();
+}
+function stopGps() { if (gps.timer) clearInterval(gps.timer); gps.timer = null; if (gps.state !== 'insecure' && gps.state !== 'unsupported') gps.state = 'off'; releaseScreen(); paintGps(); }
+function poll() {
+  navigator.geolocation.getCurrentPosition(async (p) => {
+    gps.state = 'on';
+    gps.last = { lat: p.coords.latitude, lon: p.coords.longitude, acc: Math.round(p.coords.accuracy) };
+    gps.sentAt = Date.now(); paintGps();
+    try { await api('/api/brob/position', { method: 'POST', body: gps.last }); } catch (e) { gps.state = 'offline'; paintGps(); }
+  }, (err) => { gps.state = err.code === 1 ? 'denied' : 'searching'; paintGps(); }, { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 });
+}
+let wl = null;
+async function lockScreen() { try { if ('wakeLock' in navigator && !wl) { wl = await navigator.wakeLock.request('screen'); wl.addEventListener('release', () => (wl = null)); } } catch (e) {} }
+function releaseScreen() { try { wl && wl.release(); } catch (e) {} wl = null; }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && gps.timer) lockScreen(); });
+function paintGps() {
+  const el = $('#gps'); if (!el) return;
+  const M = {
+    on: ['', '📡', 'Position partagée en direct', gps.last ? `Précision ${gps.last.acc} m · envoyée à ${hhmm(gps.sentAt)}` : ''],
+    searching: ['warn', '🛰️', 'Recherche du signal GPS…', 'Sortez à l\'air libre si possible'],
+    denied: ['bad', '🚫', 'GPS refusé', 'Autorisez la localisation dans les réglages du navigateur'],
+    insecure: ['warn', '🔒', 'GPS indisponible sur cette connexion', 'Il faut le lien sécurisé (https). Vos étapes sont quand même envoyées.'],
+    unsupported: ['warn', '📵', 'GPS non supporté', 'Vos étapes sont quand même envoyées.'],
+    offline: ['warn', '📶', 'Connexion instable', 'Nouvelle tentative automatique…'],
+    off: ['', '📍', 'Position non partagée', 'Elle n\'est partagée que pendant une mission.'],
+  }[gps.state] || [];
+  el.className = 'gps ' + M[0];
+  el.innerHTML = `<div class="gpsi">${M[1]}</div><div class="gpst"><b>${M[2]}</b><span>${esc(M[3] || '')}</span></div>`;
+}
+
+/* ── Chat Direct avec le Client ── */
+async function sendChat(missionId) {
+  const inp = $('#chatInput');
+  if (!inp || !inp.value.trim()) return;
+  const text = inp.value.trim();
+  inp.value = '';
+  try {
+    await fetch(`${API_BASE}/api/missions/${missionId}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: JSON.stringify({ sender: 'brob', text })
+    });
+    refresh(true);
+  } catch (e) {
+    if (me && me.mission) { (me.mission.chat_messages = me.mission.chat_messages || []).push({ sender: 'brob', text }); render(); }
+  }
+}
+
+async function sendQuickReply(missionId, text) {
+  try {
+    await fetch(`${API_BASE}/api/missions/${missionId}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: JSON.stringify({ sender: 'brob', text })
+    });
+    refresh(true);
+  } catch (e) {
+    if (me && me.mission) { (me.mission.chat_messages = me.mission.chat_messages || []).push({ sender: 'brob', text }); render(); }
+  }
+}
+
+function triggerInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; $('#pwaPill').style.display = 'none'; });
+  }
+}
+
+/* ── Rendu Principal ── */
+function render() {
+  if (!me) return renderLogin();
+  const first = me.profile.name.split(' ')[0];
+  $('#app').innerHTML = `
+    <div class="hero"><div class="row">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="assets/logo.jpg?v=3" alt="Brobroli" style="width:48px;height:48px;border-radius:15px;border:2px solid rgba(255,255,255,.9);object-fit:cover;box-shadow:0 6px 16px rgba(0,0,0,.35)">
+        <div><div class="hello">Brobrosseur certifié 👋</div><div class="who">${esc(first)}</div></div>
+      </div>
+      <div class="online"><span class="dot"></span>En ligne</div>
+    </div></div>
+    <div class="content">
+      <div id="pwaPill" class="pwa-pill">
+        <span>📲 Installer Brobroli sur l'écran d'accueil</span>
+        <button onclick="triggerInstall()" style="background:var(--g1);color:#fff;border:0;padding:6px 12px;border-radius:8px;font-weight:800;font-size:12px">Installer</button>
+      </div>
+      ${tab === 'mission' ? viewMission() : tab === 'gains' ? viewGains() : viewProfile()}
+    </div>
+    <nav class="tabs">
+      <button class="tab ${tab === 'mission' ? 'on' : ''}" onclick="setTab('mission')"><i>🧭</i>Mission</button>
+      <button class="tab ${tab === 'gains' ? 'on' : ''}" onclick="setTab('gains')"><i>💰</i>Mes gains</button>
+      <button class="tab ${tab === 'profil' ? 'on' : ''}" onclick="setTab('profil')"><i>👤</i>Profil</button>
+    </nav>`;
+  paintGps();
+  if (deferredPrompt && $('#pwaPill')) $('#pwaPill').style.display = 'flex';
+}
+function setTab(t) { tab = t; sig = ''; refresh(true); window.scrollTo(0, 0); }
+
+function startDemoMission() {
+  me.mission = JSON.parse(JSON.stringify(FALLBACK_BROB_ME.mission));
+  render();
+  toast('🚀 Mission démo lancée ! Touchez le bouton doré pour valider les étapes.');
+}
+
+/* ── Vues ── */
+function viewMission() {
+  const m = me.mission;
+  const strip = `<div class="catstrip">
+    <div class="catpic"><img src="assets/cat-marche.jpg" alt="Marché"><span>🛒 Courses Marché</span></div>
+    <div class="catpic"><img src="assets/cat-menage.jpg" alt="Ménage"><span>🧹 Ménage & Linge</span></div>
+    <div class="catpic"><img src="assets/cat-cuisine.jpg" alt="Cuisine"><span>🍲 Cuisine & Express</span></div>
+  </div>`;
+  if (!m) return strip + `<div class="card empty"><div class="big">☕</div><h2>Pas de mission pour l'instant</h2>
+    <p>L'équipe Brobroli vous assigne une mission dès qu'une commande arrive près de vous. Un carillon et une vibration retentiront dès l'arrivée d'une mission.</p>
+    <button class="btn" style="margin-top:16px;background:linear-gradient(135deg,var(--g1),var(--g2));width:100%" onclick="startDemoMission()">🚀 Lancer une mission démo en direct</button>
+  </div>
+  <div class="card"><div class="gps" id="gps"></div></div>`;
+
+  const total = m.steps.length, done = m.step;
+  const cur = m.steps[m.step];
+  const finished = m.status === 'delivered';
+  const bannerImg = m.kind === 'courses' ? 'assets/cat-marche.jpg' : m.kind === 'service' ? 'assets/cat-menage.jpg' : 'assets/cat-cuisine.jpg';
+  const cleanPhone = (m.client_phone || '').replace(/\D/g, '');
+  const chatMsgs = m.chat_messages || [];
+
+  const stepsHtml = m.steps.map((s, i) => {
+    const st = i < done ? 'done' : i === done ? 'cur' : 'todo';
+    const log = m.steps_log.find((l) => l.key === s.key);
+    return `<div class="step ${st}"><div class="bub">${i < done ? '✓' : s.icon}</div>
+      <div><div class="stxt">${esc(s.label)}</div>${log ? `<div class="stime">à ${hhmm(log.at)}</div>` : ''}</div></div>`;
+  }).join('');
+
+  return `
+  <!-- HERO ACTION RAPIDE DU HAUT -->
+  ${!finished && cur ? `
+    <div class="action-hero">
+      <div class="subtag">📍 ÉTAPE EN COURS (${done + 1}/${total})</div>
+      <div class="act-title">${cur.icon} ${esc(cur.action)}</div>
+      <div class="act-desc">${esc(cur.label)}</div>
+      <button class="btn-do" onclick="doStep()">👉 VALIDER CETTE ÉTAPE</button>
+    </div>
+  ` : ''}
+
+  <!-- DÉTAILS DE LA COURSE & BUDGET -->
+  <div class="card" style="overflow:hidden;padding:0">
+    <div style="height:124px;position:relative">
+      <img src="${bannerImg}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(4,32,16,.9));display:flex;align-items:flex-end;justify-content:space-between;padding:14px 18px;color:#fff">
+        <div><div style="font-size:11.5px;font-weight:900;opacity:.92;text-transform:uppercase">${esc(m.ref)} · Client : ${esc(m.client_first)}</div><div style="font-size:20px;font-weight:900">${esc(m.service_name)}</div></div>
+        <div style="background:#12a150;padding:6px 14px;border-radius:14px;text-align:right"><b style="font-size:19px;display:block;font-weight:900">${fcfa(m.brob_net)}</b><span style="font-size:10.5px;font-weight:800;text-transform:uppercase">Gain net</span></div>
+      </div>
+    </div>
+    <div style="padding:18px">
+      <div class="info" style="margin-top:0">
+        <div class="irow" style="display:flex;gap:10px;align-items:flex-start">
+          <i style="font-style:normal;font-size:20px">📍</i>
+          <div><b style="font-size:15px;display:block">${esc(m.address)}</b>${m.landmark ? `<small style="margin-top:3px;display:block;color:var(--muted);font-size:12.5px">Repère : ${esc(m.landmark)}</small>` : ''}</div>
+        </div>
+      </div>
+      ${m.description ? `<div style="background:#f4f8f5;border-radius:14px;padding:12px;margin:12px 0;font-size:13.5px;border:1px solid #d4e8db"><b>📋 Consignes client :</b><br>${esc(m.description)}</div>` : ''}
+      <a class="btn sm" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;background:#eef6f0;color:var(--g1);border:1.5px solid var(--g2);height:42px;border-radius:12px;box-shadow:none;margin-top:10px" href="${esc(m.maps_url)}" target="_blank" rel="noopener">🗺️ Ouvrir l'itinéraire dans Google Maps</a>
+    </div>
+  </div>
+
+  <!-- SÉPARATEUR BUDGET VIVRES SI COURSES -->
+  ${(m.budget_vivres && m.budget_vivres > 0) ? `
+    <div class="vivres-card">
+      <div class="vhead">
+        <span>🛒 AVANCE VIVRES DU CLIENT</span>
+        <b>${fcfa(m.budget_vivres)}</b>
+      </div>
+      <p>Fonds alloués pour acheter les provisions au marché. Photographiez le ticket/reçu de caisse lors de l'achat.</p>
+      <div class="vmode">Sécurisé sous séquestre : ${m.payment_method === 'orange_money' ? '🟠 Orange Money' : '🌊 Wave Money'}</div>
+    </div>
+  ` : ''}
+
+  <!-- BARRE CONTACT DIRECT CLIENT (APPEL & WHATSAPP) -->
+  <div class="contact-bar">
+    <a class="contact-btn call" href="tel:${esc(m.client_phone || '')}">📞 Appeler (${esc(m.client_first)})</a>
+    <a class="contact-btn wa" href="https://wa.me/225${cleanPhone}?text=${encodeURIComponent('Bonjour, c\'est votre Brobrosseur Brobroli au sujet de votre mission.')}" target="_blank" rel="noopener">💬 WhatsApp</a>
+  </div>
+
+  <!-- MESSAGERIE DIRECTE SYNCHRONISÉE (CHAT) -->
+  <div class="chat-box">
+    <div class="chat-head">
+      <span>💬 Messages directs avec le client</span>
+      <span style="font-size:11.5px;color:var(--g1);font-weight:900">🟢 En direct</span>
+    </div>
+    <div class="chat-msgs" id="chatMsgs">
+      ${chatMsgs.length ? chatMsgs.map(msg => `
+        <div class="cmsg ${msg.sender}">${msg.sender === 'brob' ? 'Vous : ' : msg.sender === 'client' ? esc(m.client_first) + ' : ' : ''}${esc(msg.text)}</div>
+      `).join('') : '<div class="cmsg system">Début de la conversation sécurisée</div>'}
+    </div>
+    <div class="quick-replies">
+      <span class="qr-chip" onclick="sendQuickReply('${m.id}','Je suis en route vers vous 🚴')">En route 🚴</span>
+      <span class="qr-chip" onclick="sendQuickReply('${m.id}','Je commence vos achats au marché 🛒')">Au marché 🛒</span>
+      <span class="qr-chip" onclick="sendQuickReply('${m.id}','Je suis devant votre porte 🏠')">Devant la porte 🏠</span>
+      <span class="qr-chip" onclick="sendQuickReply('${m.id}','J\\'ai bien le ticket avec moi 🧾')">Ticket prêt 🧾</span>
+    </div>
+    <div class="chat-input-row">
+      <input id="chatInput" placeholder="Écrire au client…" onkeydown="if(event.key==='Enter')sendChat('${m.id}')">
+      <button onclick="sendChat('${m.id}')">Envoyer</button>
+    </div>
+  </div>
+
+  <!-- JUSTIFICATIF / TICKET SI PRÉSENT -->
+  ${m.photo ? `
+    <div class="card" style="padding:16px;background:#f8faf9">
+      <div style="font-size:12px;font-weight:900;color:var(--g1);text-transform:uppercase;margin-bottom:8px">🧾 Ticket / Justificatif enregistré</div>
+      <div style="border-radius:14px;overflow:hidden;border:1.5px solid var(--line);max-height:200px">
+        <img src="${m.photo}" alt="Justificatif" style="width:100%;height:100%;object-fit:cover;display:block">
+      </div>
+    </div>
+  ` : ''}
+
+  <!-- PROGRESSION ET LISTE DES ÉTAPES -->
+  <div class="card">
+    <h3>Votre avancement · ${done}/${total}</h3>
+    <div class="progress"><div style="width:${Math.round(done / total * 100)}%"></div></div>
+    <div class="steps">${stepsHtml}</div>
+  </div>
+
+  <!-- FIN DE MISSION OU CTA FLOTTANT -->
+  ${finished ? `
+    <div class="card" style="text-align:center">
+      <div class="party">🎉</div>
+      <h2 style="margin:6px 0;font-size:22px;font-weight:900">Bravo, mission livrée !</h2>
+      <p style="color:var(--muted);font-size:14px">Le client valide la prestation et la note. Dès validation, votre gain de <b>${fcfa(m.brob_net)}</b> est crédité sur votre compte.</p>
+    </div>
+  ` : `
+    <div class="cta"><button class="btn ${m.step === 0 ? 'green' : ''}" id="act" onclick="doStep()">${cur.icon}&nbsp; ${esc(cur.action)}</button></div>
+  `}
+
+  <div class="card"><div class="gps" id="gps"></div></div>
+  ${finished ? '' : `<button class="sos" onclick="askSos()">🚨 J'ai un problème — alerter l'équipe</button>`}`;
+}
+
+function viewGains() {
+  const w = me.wallet;
+  return `<div class="kpis">
+    <div class="kpi main"><span>Revenus disponibles</span><b>${fcfa(w.pending)}</b></div>
+    <div class="kpi"><span>Missions faites</span><b>${w.missions}</b></div>
+    <div class="kpi"><span>En séquestre</span><b>${fcfa(w.awaiting)}</b></div></div>
+  <div class="card"><h3>Dernières missions validées</h3>
+    ${me.recent.length ? me.recent.map((r) => `<div class="hrow"><div class="hi">${r.icon}</div><div><b>${esc(r.service_name)}</b><small>${esc(r.ref)} · ${new Date(r.at).toLocaleDateString('fr-FR')}</small></div><b>+${fcfa(r.brob_net)}</b></div>`).join('')
+      : '<p style="color:var(--muted);text-align:center;padding:14px 0">Vos premières missions apparaîtront ici.</p>'}
+  </div>`;
+}
+
+function viewProfile() {
+  const p = me.profile;
+  return `<div class="card" style="text-align:center"><div class="logo" style="margin:0 auto 12px;width:88px;height:88px"><img src="assets/logo.jpg?v=3" alt="Brobroli"></div>
+    <h2 style="font-size:22px;font-weight:900">${esc(p.name)}</h2><p style="color:var(--muted);font-size:14px">${esc(p.phone)}</p>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap">
+      <span style="background:#e8f7ee;color:var(--g1);font-weight:800;padding:8px 14px;border-radius:99px;font-size:13px">${p.verified ? '✅ Identité vérifiée' : '⏳ En vérification'}</span>
+      <span style="background:#fff8eb;color:#9a6200;font-weight:800;padding:8px 14px;border-radius:99px;font-size:13px">🏆 ${esc(p.badge)}</span>
+      <span style="background:#eef3ff;color:#2457d6;font-weight:800;padding:8px 14px;border-radius:99px;font-size:13px">⭐ ${Number(p.rating).toFixed(1)} / 5</span></div>
+    <div style="margin-top:16px">
+      <a href="${API_BASE || ''}/badge" target="_blank" class="btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#064e26,#0e8a45)">🪪 Présenter mon Badge Officiel (QR & CNI)</a>
+    </div></div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0">🏅 Vos Badges de Certification</h3>
+      <span style="font-size:11.5px;font-weight:900;color:var(--g1);background:#e8f7ee;padding:3px 10px;border-radius:99px">${(p.certifications || []).length} Actifs</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${(p.certifications_def || [
+        { id:'cni', name:'CNI Vérifiée', icon:'🛡️' },
+        { id:'casier', name:'Casier Vierge', icon:'⚖️' },
+        { id:'garant', name:'Garant Validé', icon:'🤝' },
+        { id:'expert_marche', name:'Expert Grand Marché', icon:'🛒' },
+        { id:'maitre_linge', name:'Maître Linge', icon:'👔' },
+        { id:'top_rated', name:'Top Prestataire 5/5', icon:'⭐' },
+        { id:'ponctualite', name:'100% Ponctuel', icon:'⏱️' },
+        { id:'elite_or', name:'Élite Or', icon:'🥇' }
+      ]).map(cd => {
+        const has = (p.certifications || []).includes(cd.id);
+        return `
+          <div style="padding:10px 12px;border-radius:15px;border:1.5px solid ${has ? '#2ee07f' : 'var(--line)'};background:${has ? '#f0fbf4' : '#fafcfb'};opacity:${has ? '1' : '.45'}">
+            <div style="font-size:22px">${cd.icon}</div>
+            <b style="font-size:12px;display:block;margin-top:4px;color:${has ? 'var(--ink)' : 'var(--muted)'}">${esc(cd.name)}</b>
+            <small style="font-size:10.5px;color:var(--muted);display:block">${has ? '✅ Certifié actif' : '🔒 À débloquer'}</small>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  </div>
+  <div class="card"><h3>Règles d'or Brobrosseur</h3>
+    <div style="display:flex;gap:10px;margin-bottom:10px"><i>📸</i><div>Photo du ticket à chaque achat pour libérer vos fonds</div></div>
+    <div style="display:flex;gap:10px;margin-bottom:10px"><i>⏱️</i><div>Ponctualité et politesse avec le client</div></div>
+    <div style="display:flex;gap:10px"><i>💬</i><div>Un doute ? Appelez l'équipe, ne devinez pas.</div></div></div>
+  ${me.support_phone ? `<a class="btn sm ghost" style="width:100%;height:44px;border:1.5px solid var(--line);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px" href="tel:${esc(me.support_phone)}">📞 Appeler l'équipe Brobroli</a><div style="height:12px"></div>` : ''}
+  <button class="sos" style="background:#f3f6f4;color:var(--ink);border-color:var(--line)" onclick="logout()">Se déconnecter</button>`;
+}
+
+/* ── Actions ── */
+function doStep() {
+  const m = me.mission; if (!m || busy) return;
+  const d = m.steps[m.step]; if (!d) return;
+  if (d.photo) {
+    sheet(`<h2>${d.photo === true ? '📸 Photo obligatoire' : '📸 Photo du résultat'}</h2>
+      <p>${d.photo === true ? 'Prenez en photo le ticket / justificatif : c\'est ce qui rassure le client et protège votre paiement.' : 'Une photo du travail terminé rassure le client (recommandé).'}</p>
+      <button class="btn" onclick="$('#cam').click()">📸 Prendre la photo</button>
+      <button class="btn ghost" onclick="closeSheet();sendStep('${d.key}')">Continuer sans photo</button>`);
+  } else sendStep(d.key);
+}
+$('#cam').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const m = me.mission, d = m.steps[m.step];
+  closeSheet(); busy = true; toast('Envoi de la photo…');
+  try {
+    const data = await compress(f);
+    const r = await api('/api/brob/photo', { method: 'POST', body: { mission_id: m.id, data } });
+    busy = false; await sendStep(d.key, r.photo);
+  } catch (err) { busy = false; toast(err.message || 'Photo non envoyée', true); }
+});
+function compress(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 1000 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg', 0.65));
+    };
+    img.onerror = () => rej(new Error('Image illisible')); img.src = url;
+  });
+}
+async function sendStep(key, photo) {
+  if (busy) return; busy = true;
+  const b = $('#act'); if (b) { b.disabled = true; b.textContent = 'Envoi…'; }
+  try {
+    const g = gps.last || {};
+    await api(`/api/brob/missions/${me.mission.id}/step`, { method: 'POST', body: { key, photo, lat: g.lat, lon: g.lon, acc: g.acc } });
+    if (navigator.vibrate) navigator.vibrate(60);
+    speakAudio(key === 'delivered' ? 'Bravo ! Mission livrée au client.' : 'Étape validée. Continuez votre mission.');
+    busy = false; await refresh(true);
+    if (me.mission && me.mission.status === 'delivered') toast('🎉 Livraison enregistrée, bravo !');
+  } catch (e) {
+    busy = false;
+    if (me && me.mission) {
+      me.mission.step = Math.min(me.mission.steps.length, me.mission.step + 1);
+      me.mission.steps_log.push({ key, at: Date.now() });
+      if (me.mission.step >= me.mission.steps.length) me.mission.status = 'delivered';
+      speakAudio(key === 'delivered' ? 'Bravo ! Mission livrée au client.' : 'Étape validée. Continuez votre mission.');
+      render();
+    } else {
+      toast(e.message, true);
+    }
+  }
+}
+function askSos() {
+  sheet(`<h2>🚨 Alerter l'équipe ?</h2><p>L'équipe Brobroli sera prévenue tout de suite avec votre position et vous appellera.</p>
+    <button class="btn red" onclick="sendSos()">Oui, envoyer l'alerte</button><button class="btn ghost" onclick="closeSheet()">Non, annuler</button>`);
+}
+async function sendSos() {
+  closeSheet();
+  try { const g = gps.last || {}; await api('/api/brob/sos', { method: 'POST', body: { lat: g.lat, lon: g.lon } }); toast('Alerte envoyée. L\'équipe vous appelle.'); }
+  catch (e) { toast(e.message, true); }
+}
+
+refresh(true);
+</script>
+</body>
+</html>

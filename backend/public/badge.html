@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brobroli — Badge Officiel Brobrosseur Agréé</title>
+<style>
+:root {
+  --g1: #0f8a44;
+  --g2: #19b359;
+  --dark: #07190e;
+  --gold: #d4a017;
+  --gold-glow: rgba(212, 160, 23, 0.4);
+  --ivory-orange: #ff8200;
+  --ivory-white: #ffffff;
+  --ivory-green: #009a44;
+  --card-w: 360px;
+  --card-h: 570px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body {
+  background: radial-gradient(circle at 50% 20%, #153823, #08160c 80%);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+}
+.header-bar {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.header-bar h1 {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.header-bar p {
+  color: #9eb8a5;
+  font-size: 13.5px;
+  margin-top: 4px;
+}
+
+/* Lanyard & Hole punch */
+.badge-rig {
+  perspective: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lanyard-strap {
+  width: 44px;
+  height: 48px;
+  background: linear-gradient(90deg, #125e32, #1eb75e 50%, #125e32);
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.lanyard-clip {
+  width: 28px;
+  height: 20px;
+  background: linear-gradient(180deg, #e0e0e0, #8d8d8d);
+  border-radius: 4px 4px 10px 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+  position: relative;
+  top: 10px;
+  z-index: 2;
+}
+
+/* 3D Flip Card Container */
+.card-scene {
+  width: var(--card-w);
+  height: var(--card-h);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  margin-top: 6px;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.6), 0 0 40px rgba(30, 183, 94, 0.2);
+  border-radius: 22px;
+}
+.card-scene.flipped {
+  transform: rotateY(180deg);
+}
+
+.badge-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  background: #0d2315;
+  display: flex;
+  flex-direction: column;
+}
+.badge-back {
+  transform: rotateY(180deg);
+  background: #091a10;
+}
+
+/* Top ribbon Ivory Coast */
+.ci-ribbon {
+  height: 6px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.ci-ribbon .c-or { background: var(--ivory-orange); }
+.ci-ribbon .c-wh { background: var(--ivory-white); }
+.ci-ribbon .c-gr { background: var(--ivory-green); }
+
+/* Badge hole */
+.slot-hole {
+  width: 50px;
+  height: 10px;
+  background: #050d08;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  margin: 8px auto 6px;
+}
+
+/* Badge Header */
+.badge-header {
+  padding: 4px 16px 8px;
+  text-align: center;
+  position: relative;
+}
+.badge-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.badge-brand img {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1.5px solid var(--gold);
+  object-fit: cover;
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+.badge-brand-text b {
+  display: block;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+}
+.badge-brand-text span {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #55e692;
+  font-weight: 800;
+}
+.badge-type-pill {
+  display: inline-block;
+  background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+  color: #1a1200;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 3px 14px;
+  border-radius: 99px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Photo and Ring */
+.photo-wrap {
+  text-align: center;
+  margin: 8px 0 6px;
+  position: relative;
+}
+.avatar-frame {
+  width: 106px;
+  height: 106px;
+  margin: 0 auto;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, #ffd700, #1eb75e, #ffd700);
+  box-shadow: 0 0 20px rgba(30, 183, 94, 0.4);
+  position: relative;
+}
+.avatar-frame img, .avatar-frame .avatar-svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #143521;
+  display: block;
+}
+.verified-check {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  background: #00b050;
+  border: 3px solid #0d2315;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+/* Identity details */
+.brob-details {
+  text-align: center;
+  padding: 0 16px;
+}
+.brob-name {
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+.brob-matricule {
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffd700;
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+
+/* Rating & Level */
+.rating-box {
+  margin: 10px 16px 6px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 14px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.rat-col {
+  text-align: center;
+}
+.rat-col span {
+  font-size: 9.5px;
+  color: #8da694;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: block;
+}
+.rat-col b {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 900;
+}
+.rat-stars {
+  color: #ffd700;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+/* Verification hologram seal */
+.hologram-strip {
+  margin: 6px 16px;
+  background: linear-gradient(90deg, #103820, #1c6137 50%, #103820);
+  border: 1px dashed rgba(255, 215, 0, 0.4);
+  border-radius: 10px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.holo-seal {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe066, #b8860b);
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  color: #1a1200;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  flex-shrink: 0;
+}
+.holo-txt b {
+  display: block;
+  font-size: 10px;
+  color: #ffd700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.holo-txt small {
+  display: block;
+  font-size: 8.5px;
+  color: #b8d4c0;
+}
+
+/* Footer / QR code */
+.badge-footer {
+  margin-top: auto;
+  padding: 10px 16px 14px;
+  background: #06130b;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.qr-box {
+  width: 58px;
+  height: 58px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.qr-box svg {
+  width: 100%;
+  height: 100%;
+}
+.qr-info {
+  flex: 1;
+  padding-left: 12px;
+}
+.qr-info b {
+  font-size: 11px;
+  color: #fff;
+  display: block;
+}
+.qr-info span {
+  font-size: 9px;
+  color: #799982;
+  display: block;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* Back Face details */
+.back-content {
+  padding: 12px 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.back-title {
+  font-size: 13px;
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.25);
+  padding-bottom: 6px;
+}
+.rule-item {
+  display: flex;
+  gap: 10px;
+  font-size: 11.5px;
+  color: #d8e5dc;
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+.rule-item i {
+  font-style: normal;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.rule-item b {
+  color: #55e692;
+}
+
+.hotline-box {
+  background: #143521;
+  border: 1px solid #1eb75e;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  margin-top: auto;
+}
+.hotline-box span {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  color: #92b59b;
+  font-weight: 700;
+  display: block;
+}
+.hotline-box b {
+  font-size: 16px;
+  color: #fff;
+  letter-spacing: 1px;
+  display: block;
+  margin-top: 2px;
+}
+
+.sign-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 9.5px;
+  color: #8da694;
+}
+.sign-box b {
+  color: #fff;
+  display: block;
+  font-size: 11px;
+}
+.barcode {
+  height: 26px;
+  display: flex;
+  gap: 2px;
+  align-items: stretch;
+  background: #fff;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.barcode i {
+  background: #000;
+  display: block;
+}
+
+/* Actions below badge */
+.actions-bar {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 480px;
+}
+.btn-act {
+  background: linear-gradient(135deg, #10803e, #1ab359);
+  color: #fff;
+  border: 0;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(16, 128, 62, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-act:active {
+  transform: scale(0.97);
+}
+.btn-act.secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.btn-act.gold {
+  background: linear-gradient(135deg, #b8860b, #ffd700);
+  color: #1a1200;
+  box-shadow: 0 4px 14px rgba(255, 215, 0, 0.4);
+}
+
+/* Modal for rating simulation */
+#toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: #0f8a44;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-weight: 800;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  z-index: 1000;
+  text-align: center;
+}
+#toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+  }
+  .header-bar, .actions-bar, .lanyard-strap, .lanyard-clip, #toast {
+    display: none !important;
+  }
+  .badge-rig {
+    flex-direction: row !important;
+    gap: 30px !important;
+    justify-content: center !important;
+  }
+  .card-scene {
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    transform: none !important;
+    width: 320px !important;
+    height: 500px !important;
+    border: 1px solid #999 !important;
+  }
+  .badge-back {
+    position: relative !important;
+    transform: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header-bar">
+  <h1>🪪 Badge Officiel Brobrosseur Agréé</h1>
+  <p>Carte d'accréditation sécurisée avec contrôle CNI, QR Code et score client en temps réel</p>
+</div>
+
+<div class="badge-rig">
+  <div class="lanyard-strap">
+    <div class="lanyard-clip"></div>
+  </div>
+
+  <div class="card-scene" id="badgeCard" onclick="toggleFlip()">
+    
+    <!-- ── RECTO DE LA CARTE ── -->
+    <div class="badge-face badge-front">
+      <div class="ci-ribbon">
+        <div class="c-or"></div>
+        <div class="c-wh"></div>
+        <div class="c-gr"></div>
+      </div>
+      <div class="slot-hole"></div>
+
+      <div class="badge-header">
+        <div class="badge-brand">
+          <img src="/assets/logo.jpg?v=2" onerror="this.onerror=null;this.src='Visuels_et_Logo/logo.jpg';" alt="Logo Brobroli">
+          <div class="badge-brand-text">
+            <b>BROBROLI</b>
+            <span>Plateforme Agréée · Abidjan</span>
+          </div>
+        </div>
+        <div class="badge-type-pill" id="badgePill">🏆 EXPERT AGRÉÉ (TOP 1%)</div>
+      </div>
+
+      <div class="photo-wrap">
+        <div class="avatar-frame">
+          <!-- Portrait photo Aminata Koné / Brobrosseur -->
+          <svg class="avatar-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" fill="#143e26"/>
+            <circle cx="50" cy="38" r="22" fill="#e8a87c"/>
+            <path d="M50 14 C36 14 30 26 30 38 C30 46 34 50 36 50 C38 42 42 28 50 28 C58 28 62 42 64 50 C66 50 70 46 70 38 C70 26 64 14 50 14 Z" fill="#1a110a"/>
+            <circle cx="43" cy="38" r="2.5" fill="#2d1c10"/>
+            <circle cx="57" cy="38" r="2.5" fill="#2d1c10"/>
+            <path d="M46 47 Q50 51 54 47" stroke="#9e4a2b" stroke-width="2" stroke-linecap="round"/>
+            <path d="M22 92 C22 68 35 62 50 62 C65 62 78 68 78 92 Z" fill="#1cb85c"/>
+            <path d="M38 64 L50 78 L62 64" fill="#ffd700"/>
+          </svg>
+          <div class="verified-check">✓</div>
+        </div>
+      </div>
+
+      <div class="brob-details">
+        <div class="brob-name" id="bName">Aminata KONÉ</div>
+        <div class="brob-matricule" id="bMatricule">MATRICULE : CI-BROB-2026-0042</div>
+      </div>
+
+      <div class="rating-box">
+        <div class="rat-col">
+          <span>Note Globale</span>
+          <b id="bRating">4.9 / 5</b>
+          <div class="rat-stars" id="bStars">⭐⭐⭐⭐⭐</div>
+        </div>
+        <div class="rat-col" style="border-left:1px solid rgba(255,255,255,0.15);padding-left:14px">
+          <span>Avis Clients</span>
+          <b id="bReviewsCount">128 avis</b>
+          <span style="color:#55e692">100% Vérifiés</span>
+        </div>
+        <div class="rat-col" style="border-left:1px solid rgba(255,255,255,0.15);padding-left:14px">
+          <span>Zone</span>
+          <b>Cocody</b>
+          <span style="font-size:9px">Angré 8e</span>
+        </div>
+      </div>
+
+      <div class="hologram-strip">
+        <div class="holo-seal">🛡️</div>
+        <div class="holo-txt">
+          <b>IDENTITÉ & CASIER JUDICIAIRE VÉRIFIÉS</b>
+          <small>Enregistrement officiel Brobroli Services CI</small>
+        </div>
+      </div>
+
+      <div class="badge-footer">
+        <div class="qr-box">
+          <!-- QR Code vectoriel stylisé pointant vers la vérification -->
+          <svg viewBox="0 0 100 100" fill="#07190e">
+            <rect x="10" y="10" width="28" height="28" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+            <rect x="18" y="18" width="12" height="12" fill="#07190e"/>
+            <rect x="62" y="10" width="28" height="28" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+            <rect x="70" y="18" width="12" height="12" fill="#07190e"/>
+            <rect x="10" y="62" width="28" height="28" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+            <rect x="18" y="70" width="12" height="12" fill="#07190e"/>
+            <rect x="44" y="14" width="8" height="16" rx="2"/>
+            <rect x="44" y="38" width="12" height="8" rx="2"/>
+            <rect x="62" y="44" width="16" height="8" rx="2"/>
+            <rect x="44" y="58" width="8" height="28" rx="2"/>
+            <rect x="60" y="62" width="12" height="12" rx="2"/>
+            <rect x="78" y="62" width="12" height="24" rx="2"/>
+          </svg>
+        </div>
+        <div class="qr-info">
+          <b>Scanner pour Vérification</b>
+          <span>Scannez avec un téléphone pour voir les avis certifiés et l'identité légale en temps réel.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VERSO DE LA CARTE ── -->
+    <div class="badge-face badge-back">
+      <div class="ci-ribbon">
+        <div class="c-or"></div>
+        <div class="c-wh"></div>
+        <div class="c-gr"></div>
+      </div>
+      <div class="slot-hole"></div>
+
+      <div class="back-content">
+        <div class="back-title">Charte de Confiance & Sécurité</div>
+
+        <div class="rule-item">
+          <i>1️⃣</i>
+          <div><b>Présentation Obligatoire :</b> Le Brobrosseur doit porter son badge visible à l'entrée des résidences et devant le client.</div>
+        </div>
+
+        <div class="rule-item">
+          <i>2️⃣</i>
+          <div><b>Paiement Protégé :</b> Aucun paiement en espèces direct. Tous les règlements s'effectuent via le séquestre sécurisé de l'application.</div>
+        </div>
+
+        <div class="rule-item">
+          <i>3️⃣</i>
+          <div><b>Traçabilité Intégrale :</b> Mission suivie par GPS en direct. Chaque achat est obligatoirement validé par la photo du ticket de caisse.</div>
+        </div>
+
+        <div class="rule-item">
+          <i>4️⃣</i>
+          <div><b>Excellence & Respect :</b> Courtoisie irréprochable et respect strict des consignes du client sous peine de révocation immédiate.</div>
+        </div>
+
+        <div class="hotline-box">
+          <span>Assistance & Contrôle Sécurité 24h/7j</span>
+          <b>📞 +225 07 00 00 00 00</b>
+        </div>
+
+        <div class="sign-box">
+          <div>
+            <span>Validité :</span>
+            <b>11/2026 – 11/2027</b>
+          </div>
+          <div style="text-align:right">
+            <span>Direction Opérations :</span>
+            <b style="font-family:'Brush Script MT', cursive;font-size:16px;color:#ffd700">G. Fondateur</b>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.15)">
+          <div class="barcode" id="bBarcode"></div>
+          <span style="font-size:8px;color:#708a78;letter-spacing:1px">SÉCURISÉ ISO-7810</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="actions-bar">
+  <button class="btn-act" onclick="toggleFlip()">🔄 Retourner la Carte (Recto / Verso)</button>
+  <button class="btn-act secondary" onclick="window.print()">🖨️ Imprimer le Badge (Format Plastifié)</button>
+  <a class="btn-act secondary" href="/cockpit" target="_blank">🖥️ Ouvrir le Cockpit 3-en-1</a>
+  <a class="btn-act gold" href="/client" target="_blank">🛍️ Tester la Notation Client</a>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let flipped = false;
+
+function toggleFlip() {
+  flipped = !flipped;
+  $('#badgeCard').classList.toggle('flipped', flipped);
+}
+
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Generate realistic barcode
+function generateBarcode() {
+  const b = $('#bBarcode');
+  if (!b) return;
+  const widths = [2, 1, 3, 1, 2, 4, 1, 3, 2, 1, 3, 2, 4, 1, 2, 3, 1, 2, 3, 2];
+  b.innerHTML = widths.map(w => `<i style="width:${w}px"></i>`).join('');
+}
+
+// Load real-time Brobrosseur data
+async function loadBrobrosseurData() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id') || 'b-demo';
+    const res = await fetch(`/api/public/badge/${id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    
+    if (data.name) $('#bName').textContent = data.name;
+    if (data.matricule) $('#bMatricule').textContent = 'MATRICULE : ' + data.matricule;
+    if (data.badge) $('#badgePill').textContent = data.badge.toUpperCase();
+    if (data.rating) {
+      $('#bRating').textContent = Number(data.rating).toFixed(1) + ' / 5';
+      const numStars = Math.round(Number(data.rating));
+      $('#bStars').textContent = '⭐'.repeat(numStars);
+    }
+    if (data.ratings_count) {
+      $('#bReviewsCount').textContent = data.ratings_count + ' avis';
+    }
+  } catch (e) {
+    console.error('Badge offline preview mode', e);
+  }
+}
+
+generateBarcode();
+loadBrobrosseurData();
+</script>
+</body>
+</html>

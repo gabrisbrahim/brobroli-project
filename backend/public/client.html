@@ -1,0 +1,990 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#064e26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brobroli">
+<link rel="manifest" href="manifest-client.json">
+<link rel="apple-touch-icon" href="assets/logo.jpg">
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<title>Brobroli — Vos Services & Courses à Abidjan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<script src="vendor/leaflet.js"></script>
+<style>
+:root{
+  --g1:#064e26; --g2:#0e8a45; --g3:#2ee07f; --gold:#f5a30b; --gold-light:#fff8eb; --red:#e53935;
+  --bg:#f4f8f5; --card:#ffffff; --ink:#091d12; --muted:#556e5f; --line:#e1ece4;
+  --shadow-sm:0 4px 12px rgba(9,29,18,.06);
+  --shadow:0 12px 32px -8px rgba(6,78,38,.18);
+  --shadow-lg:0 20px 48px -12px rgba(6,78,38,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+#app{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:100px;background:var(--bg);position:relative}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0}
+
+/* Header & Brand */
+.hero{background:linear-gradient(165deg,#04361a 0%,#085c2e 60%,#0f8a45 100%);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 24px;border-radius:0 0 32px 32px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40%;right:-20%;width:260px;height:260px;background:radial-gradient(circle,rgba(46,224,127,.22) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:2}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:48px;height:48px;border-radius:15px;border:2px solid rgba(255,255,255,.9);object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.brand h1{font-size:22px;font-weight:900;line-height:1.1;letter-spacing:-.4px}
+.brand small{display:block;font-size:11.5px;opacity:.92;font-weight:600;color:#c0ecd0}
+.locpill{background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);padding:6px 13px;border-radius:99px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:6px}
+.locpill i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#2ee07f;box-shadow:0 0 8px #2ee07f;animation:dotpulse 1.8s infinite}
+@keyframes dotpulse{50%{opacity:.4}}
+
+.hbanner{margin-top:16px;height:142px;border-radius:22px;overflow:hidden;position:relative;border:2px solid rgba(255,255,255,.2);box-shadow:0 12px 28px -6px rgba(0,0,0,.35)}
+.hbanner img{width:100%;height:100%;object-fit:cover;display:block}
+.hbanner .ov{position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,38,19,.94) 0%,rgba(4,38,19,.3) 100%);padding:16px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff}
+.hbanner b{font-size:16.5px;font-weight:900;line-height:1.25}
+.hbanner span{font-size:12.5px;opacity:.92;margin-top:3px;color:#c2eed2}
+
+/* Trust Ticker */
+.trust-bar{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:12px 18px 0}
+.trust-bar::-webkit-scrollbar{display:none}
+.trust-chip{display:inline-flex;align-items:center;gap:5px;background:#e8f7ee;border:1px solid #c2eccf;padding:5px 11px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--g1);white-space:nowrap}
+
+/* PWA Install Banner */
+#pwaBanner{background:linear-gradient(90deg,#042211,#0a4423);color:#fff;padding:11px 16px;display:none;align-items:center;justify-content:space-between;font-size:12.5px;border-bottom:1px solid rgba(46,224,127,.35)}
+#pwaBanner b{color:#2ee07f}
+#pwaBanner button{background:#2ee07f;color:#041c0e;padding:6px 14px;border-radius:99px;font-weight:900;font-size:12px;box-shadow:0 4px 12px rgba(46,224,127,.4)}
+
+.wrap{padding:16px}
+.sec-t{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 10px;display:flex;justify-content:space-between;align-items:center}
+
+/* Search bar */
+.search-box{position:relative;margin-bottom:14px}
+.search-box input{width:100%;height:48px;border-radius:16px;border:1.5px solid var(--line);background:#fff;padding:0 16px 0 42px;font-size:14px;outline:none;box-shadow:var(--shadow-sm);transition:border-color .2s}
+.search-box input:focus{border-color:var(--g2)}
+.search-box .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.6}
+
+/* Categories filter pills */
+.filter-pills{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none}
+.filter-pills::-webkit-scrollbar{display:none}
+.pill{padding:8px 15px;border-radius:99px;border:1.5px solid var(--line);background:#fff;font-size:12.5px;font-weight:800;color:var(--muted);white-space:nowrap;cursor:pointer;transition:all .15s;box-shadow:var(--shadow-sm)}
+.pill.active{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-color:var(--g1);box-shadow:0 6px 18px -4px rgba(14,138,69,.5)}
+
+.catgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.catcard{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-sm);border:1.5px solid var(--line);cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;text-align:left}
+.catcard:active{transform:scale(.97)}
+.catcard img{width:100%;height:82px;object-fit:cover;display:block}
+.catcard .cb{padding:10px 10px 12px}
+.catcard b{display:block;font-size:12.5px;font-weight:800;line-height:1.2}
+.catcard span{display:block;font-size:11.5px;font-weight:900;color:var(--g2);margin-top:3px}
+
+.card{background:var(--card);border-radius:24px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px;border:1px solid var(--line)}
+.svc-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);transition:background .15s}
+.svc-item:last-child{border:0;padding-bottom:0}
+.svc-ic{width:46px;height:46px;border-radius:15px;background:#e9f7ef;display:grid;place-items:center;font-size:22px;flex:none;border:1px solid #c8ecd5}
+.svc-info{flex:1;min-width:0}
+.svc-info b{display:block;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svc-info small{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+.svc-act{text-align:right;flex:none}
+.svc-act b{display:block;color:var(--g1);font-size:15px;font-weight:900}
+.btn{height:46px;padding:0 18px;border-radius:14px;font-weight:800;background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;box-shadow:0 8px 20px -6px rgba(14,138,69,.5);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:14px;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.sm{height:32px;padding:0 12px;font-size:12px;border-radius:10px}
+.btn.block{width:100%}
+.btn.amber{background:linear-gradient(135deg,#f59e0b,#ff7a18);box-shadow:0 8px 20px -6px rgba(245,158,11,.5)}
+.btn.wave{background:linear-gradient(135deg,#00b2fe,#0076fe);box-shadow:0 8px 20px -6px rgba(0,122,254,.45)}
+.btn.om{background:linear-gradient(135deg,#ff7900,#d96500);box-shadow:0 8px 20px -6px rgba(255,121,0,.45)}
+
+.fl{margin-bottom:13px}
+.fl label{display:block;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.in{width:100%;height:48px;border:1.5px solid var(--line);border-radius:14px;padding:0 14px;background:#fafcfb;font-size:14.5px;outline:none;transition:border-color .15s}
+.in:focus{border-color:var(--g2);background:#fff}
+textarea.in{height:auto;min-height:80px;padding:12px 14px}
+
+.budget-pills{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 10px}
+.bpill{padding:7px 12px;border-radius:99px;border:1.5px solid var(--line);background:#fafcfb;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s}
+.bpill.sel{background:#e8f7ee;border-color:var(--g2);color:var(--g1);box-shadow:0 4px 12px rgba(14,138,69,.15)}
+
+.stepbar{display:flex;gap:5px;margin:12px 0}
+.stepbar i{flex:1;height:8px;border-radius:6px;background:#e2ece5}
+.stepbar i.d{background:linear-gradient(90deg,var(--g2),var(--g3))}
+.stepbar i.c{background:var(--gold);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+
+.slist{display:grid;gap:7px;margin-top:10px}
+.srow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:14px;background:#f5f9f6;font-size:13px;color:var(--muted)}
+.srow.done{background:#e8f8ee;color:var(--ink);font-weight:700}
+.srow.cur{background:#fff6e3;color:#7a4b00;font-weight:800;border:1.5px solid #fed27b}
+.srow time{margin-left:auto;font-size:11.5px;color:var(--muted)}
+
+/* Chat Box */
+.chat-box{background:#f8faf9;border-radius:18px;border:1px solid var(--line);padding:14px;margin:12px 0}
+.chat-msgs{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.cmsg{padding:7px 12px;border-radius:12px;font-size:13px;max-width:85%}
+.cmsg.client{background:var(--g1);color:#fff;align-self:flex-end}
+.cmsg.brob{background:#e3ede6;color:var(--ink);align-self:flex-start}
+.cmsg.system{background:#fff;border:1px solid var(--line);font-size:11.5px;color:var(--muted);align-self:center;text-align:center}
+.quick-replies{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+.qr-chip{padding:5px 11px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:11.5px;white-space:nowrap;cursor:pointer;font-weight:700;color:var(--g1)}
+
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:30}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border-radius:14px;color:#788f82;font-weight:800;font-size:11.5px;background:none;transition:all .15s}
+.tab i{font-style:normal;font-size:22px}
+.tab.on{color:var(--g1);background:#e8f7ee}
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-90px);background:#091d12;color:#fff;padding:13px 20px;border-radius:16px;font-weight:800;font-size:14px;transition:transform .28s;z-index:99;box-shadow:0 12px 30px rgba(0,0,0,.35);max-width:90%;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Modal Notation Client */
+#rateModal{position:fixed;inset:0;background:rgba(6,22,13,.7);display:none;align-items:flex-end;justify-content:center;z-index:100;backdrop-filter:blur(6px)}
+#rateModal.show{display:flex}
+.rate-sheet{width:100%;max-width:480px;background:#fff;border-radius:30px 30px 0 0;padding:24px 22px 34px;animation:slideUp .25s cubic-bezier(0.18, 0.89, 0.32, 1.28);box-shadow:0 -12px 48px rgba(0,0,0,.35)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.rate-header{text-align:center;margin-bottom:14px}
+.rate-avatar{width:62px;height:62px;border-radius:50%;margin:0 auto 10px;border:3px solid #f5a30b;display:grid;place-items:center;background:#091d12;font-size:28px;box-shadow:0 6px 18px rgba(245,163,11,.35)}
+.rate-header h2{font-size:20px;font-weight:900}
+.rate-header p{font-size:13px;color:var(--muted)}
+.star-rating{display:flex;justify-content:center;gap:12px;margin:16px 0 8px}
+.star-btn{font-size:36px;background:none;border:none;cursor:pointer;transition:transform .15s;filter:grayscale(1) opacity(.3)}
+.star-btn.active{filter:none;transform:scale(1.15)}
+.star-label{text-align:center;font-weight:900;font-size:14px;color:#d49000;margin-bottom:14px;min-height:22px}
+.rate-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.tag-chip{padding:6px 12px;border-radius:99px;border:1.5px solid var(--line);background:#f6faf7;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink)}
+.tag-chip.sel{background:#e8f7ee;border-color:var(--g2);color:var(--g1);font-weight:800}
+</style>
+</head>
+<body>
+<div id="pwaBanner">
+  <div>📲 <b>Brobroli sur votre écran</b><span style="display:block;opacity:.85;font-size:11.5px">Commandez en 1 clic sans téléchargement</span></div>
+  <button id="pwaInstallBtn" onclick="installPWA()">Installer</button>
+</div>
+
+<div id="app"></div>
+<div id="toast"></div>
+
+<!-- Modal Notation Client -->
+<div id="rateModal" onclick="if(event.target===this)closeRateModal()">
+  <div class="rate-sheet">
+    <div class="rate-header">
+      <div class="rate-avatar">🧑‍🔧</div>
+      <h2 id="rmBrobName">Notez votre Brobrosseur</h2>
+      <p id="rmSvcName">Évaluez la qualité de service reçue</p>
+    </div>
+
+    <div class="star-rating" id="starGroup">
+      <button class="star-btn" data-v="1" onclick="setRating(1)">⭐</button>
+      <button class="star-btn" data-v="2" onclick="setRating(2)">⭐</button>
+      <button class="star-btn" data-v="3" onclick="setRating(3)">⭐</button>
+      <button class="star-btn" data-v="4" onclick="setRating(4)">⭐</button>
+      <button class="star-btn active" data-v="5" onclick="setRating(5)">⭐</button>
+    </div>
+    <div class="star-label" id="starLabel">🌟 5/5 — Prestation Parfaite & Impeccable !</div>
+
+    <div class="sec-t" style="margin-top:10px;justify-content:center"><span>Points forts constatés</span></div>
+    <div class="rate-tags">
+      <span class="tag-chip sel" onclick="toggleTag(this)">⏱️ Ponctuel</span>
+      <span class="tag-chip sel" onclick="toggleTag(this)">😊 Poli & Courtois</span>
+      <span class="tag-chip sel" onclick="toggleTag(this)">🛒 Produits très frais</span>
+      <span class="tag-chip" onclick="toggleTag(this)">⚡ Hyper Rapide</span>
+      <span class="tag-chip" onclick="toggleTag(this)">🧼 Travail Soigné</span>
+      <span class="tag-chip" onclick="toggleTag(this)">🧾 Ticket Transparent</span>
+    </div>
+
+    <div class="fl" style="margin-top:12px">
+      <label>Votre commentaire (optionnel)</label>
+      <textarea class="in" id="rateComment" placeholder="Ex : Très sérieux, produits de qualité choisis au marché, merci !" style="min-height:60px"></textarea>
+    </div>
+
+    <button class="btn block" style="margin-bottom:8px" onclick="submitRating()">🌟 Valider la note & Libérer le paiement</button>
+    <button class="btn block" style="background:#f0f4f1;color:var(--muted);box-shadow:none" onclick="closeRateModal()">Fermer sans noter</button>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fcfa = (n) => Number(n || 0).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ') + ' F';
+const hhmm = (t) => new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+const API_BASE = location.protocol === 'file:' ? 'http://localhost:5000' : '';
+
+async function fetchWithTimeout(url, opts = {}, ms = 1500) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const r = await fetch(url, { ...opts, signal: ctrl.signal });
+    clearTimeout(id);
+    return r;
+  } catch (err) {
+    clearTimeout(id);
+    throw err;
+  }
+}
+
+const DEMO_FALLBACK_MISSION = {
+  id: 'm-demo-client',
+  ref: 'BR-0102',
+  service_id: 'courses-marche',
+  service_name: 'Courses au grand marché',
+  icon: '🛒',
+  kind: 'courses',
+  client_name: 'Gabriel',
+  client_phone: '0708091011',
+  address: 'Cocody Angré 8e tranche',
+  landmark: 'Après le carrefour Bluetooth',
+  description: '2 tas de tomates fraîches, gombo, piment vert, poisson fumé',
+  price: 5000,
+  budget_vivres: 0,
+  status: 'in_progress',
+  step: 2,
+  steps: [
+    { key: 'accepted', icon: '✅', label: 'Mission acceptée' },
+    { key: 'enroute', icon: '🚶', label: 'En route vers le marché' },
+    { key: 'arrived', icon: '🏪', label: 'Arrivé au marché' },
+    { key: 'working', icon: '🛒', label: 'Achats en cours' },
+    { key: 'receipt', icon: '🧾', label: 'Achats terminés' },
+    { key: 'delivering', icon: '🏠', label: 'En route chez vous' },
+    { key: 'delivered', icon: '🎉', label: 'Livré au client' }
+  ],
+  steps_log: [
+    { key: 'accepted', label: 'Mission acceptée', at: Date.now() - 600000 },
+    { key: 'enroute', label: 'En route vers le marché', at: Date.now() - 300000 }
+  ],
+  brob_name: 'Aminata Koné',
+  brob_phone: '0700000001',
+  brob_rating: 4.9,
+  brob_ratings_count: 128,
+  brob_badge: '🏆 Expert Agréé',
+  brob_certifications: [
+    { id: 'cni', name: 'CNI Vérifiée', icon: '🛡️', desc: 'Identité contrôlée' },
+    { id: 'casier', name: 'Casier Vierge', icon: '⚖️', desc: 'Contrôle probité' },
+    { id: 'expert_marche', name: 'Expert Grand Marché', icon: '🛒', desc: 'Spécialiste vivres frais' }
+  ],
+  track: { lat: 5.3565, lon: -3.9862 },
+  dest: { lat: 5.3610, lon: -3.9840 },
+  trail: [[5.3520, -3.9810], [5.3545, -3.9840], [5.3565, -3.9862]],
+  chat_messages: [
+    { sender: 'system', text: 'Mission créée et assignée à Aminata Koné' },
+    { sender: 'brob', text: 'Bonjour ! Je suis en route pour le grand marché.' }
+  ]
+};
+
+const DEFAULT_CATALOG = [
+  { id: 'courses-marche', name: 'Courses au grand marché', icon: '🛒', price: 5000, time: '1h30', kind: 'courses', group: 'Courses', popular: true },
+  { id: 'courses-super', name: 'Supermarché express', icon: '🛍️', price: 3500, time: '45 min', kind: 'courses', group: 'Courses' },
+  { id: 'pharmacie', name: 'Pharmacie / achat urgent', icon: '💊', price: 3000, time: '40 min', kind: 'courses', group: 'Courses' },
+  { id: 'gaz', name: 'Recharge gaz (B6 / B12)', icon: '🔥', price: 3000, time: '30 min', kind: 'courses', group: 'Courses' },
+  { id: 'menage', name: 'Ménage courant (2-3 pièces)', icon: '🧹', price: 6000, time: '2h30', kind: 'service', group: 'Maison', popular: true },
+  { id: 'grand-menage', name: 'Grand ménage approfondi', icon: '✨', price: 12000, time: '4h30', kind: 'service', group: 'Maison' },
+  { id: 'lessive', name: 'Lessive à la main', icon: '👕', price: 6000, time: '2h30', kind: 'service', group: 'Maison' },
+  { id: 'repassage', name: 'Repassage (10-12 pièces)', icon: '👔', price: 5000, time: '2h', kind: 'service', group: 'Maison' },
+  { id: 'repassage-trad', name: 'Repassage tenues traditionnelles', icon: '🥻', price: 6500, time: '2h', kind: 'service', group: 'Maison' },
+  { id: 'cuisine-sauce', name: 'Sauce ivoirienne à domicile', icon: '🍲', price: 8000, time: '3h', kind: 'service', group: 'Cuisine', popular: true },
+  { id: 'lavage-auto', name: 'Lavage auto à domicile', icon: '🚗', price: 4500, time: '1h30', kind: 'service', group: 'Auto' },
+  { id: 'split', name: 'Nettoyage filtres de split', icon: '❄️', price: 6000, time: '1h', kind: 'service', group: 'Dépannage' },
+  { id: 'montage', name: 'Montage de meuble', icon: '🔧', price: 8000, time: '2h', kind: 'service', group: 'Dépannage' },
+  { id: 'queue-agence', name: "File d'attente (CIE, SODECI, banque)", icon: '🧾', price: 4000, time: '1h30', kind: 'errand', group: 'Démarches' },
+  { id: 'pli-express', name: 'Pli / colis express', icon: '📦', price: 3500, time: '1h', kind: 'errand', group: 'Démarches' },
+  { id: 'sortie-ecole', name: "Sortie d'école accompagnée", icon: '🎒', price: 3500, time: '1h', kind: 'errand', group: 'Famille' },
+  { id: 'mission-speciale', name: 'Mission Spéciale Sur-Mesure', icon: '✨', price: 3500, time: 'Sur-mesure', kind: 'errand', group: 'Sur-Mesure', special: true },
+];
+let tab = 'home', catalog = DEFAULT_CATALOG.slice(), missions = [], chosenSvc = 'courses-marche';
+let activeCategory = 'all';
+let searchQuery = '';
+let vivresBudget = 0;
+let paymentMethod = 'wave';
+let customDuration = 60;
+let customEffort = 'modere';
+let customTitle = '';
+let deferredPrompt = null;
+
+function computeSmartPrice(mins = customDuration, effort = customEffort, desc = '') {
+  const m = Math.max(15, Math.min(480, Number(mins) || 60));
+  let base = 1500 + Math.round((m / 60) * 1500);
+  const effortBonus = effort === 'intense' ? Math.round(1200 + (m / 60) * 500)
+                    : effort === 'modere'  ? Math.round(500 + (m / 60) * 250)
+                    : 0;
+  const txt = String(desc || '').toLowerCase();
+  const heavyWords = /(lourd|déménag|escalier|étage|sac de riz|gaz|carton|meuble|jardin|brousse|urgent|nuit)/i;
+  const keywordBonus = heavyWords.test(txt) && effort === 'leger' ? 500 : 0;
+  return Math.max(2500, Math.round((base + effortBonus + keywordBonus) / 500) * 500);
+}
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  $('#pwaBanner').style.display = 'flex';
+});
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      $('#pwaBanner').style.display = 'none';
+      deferredPrompt = null;
+    });
+  } else {
+    toast('Sur iOS Safari : appuyez sur Partager puis "Sur l\'écran d\'accueil"');
+  }
+}
+
+function toast(msg, err) {
+  const t = $('#toast'); t.textContent = msg; t.className = 'show' + (err ? ' err' : '');
+  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ''), 3200);
+}
+
+async function load() {
+  try {
+    const c = await fetchWithTimeout(API_BASE + '/api/catalog').then((r) => r.json());
+    if (c && c.catalog && c.catalog.length) catalog = c.catalog;
+    const m = await fetchWithTimeout(API_BASE + '/api/client/missions').then((r) => r.json());
+    if (m && m.missions && m.missions.length) {
+      missions = m.missions;
+    } else {
+      const saved = JSON.parse(localStorage.getItem('bro_standalone_missions') || 'null');
+      missions = (saved && saved.length) ? saved : [DEMO_FALLBACK_MISSION];
+    }
+  } catch (e) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('bro_standalone_missions') || 'null');
+      missions = (saved && saved.length) ? saved : [DEMO_FALLBACK_MISSION];
+    } catch (_) {
+      missions = [DEMO_FALLBACK_MISSION];
+    }
+  }
+  if (tab !== 'order') render();
+}
+setInterval(() => { if (tab === 'track') load(); }, 3000);
+
+function setTab(t, svcId) {
+  if (svcId) chosenSvc = svcId;
+  tab = t; render(); window.scrollTo(0, 0);
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  render();
+}
+
+function setVivresBudget(val) {
+  vivresBudget = Number(val) || 0;
+  $$('.bpill').forEach(p => p.classList.toggle('sel', Number(p.dataset.v) === vivresBudget));
+  updateOrderTotal();
+}
+
+function setPaymentMethod(m) {
+  paymentMethod = m;
+  render();
+}
+
+function updateOrderTotal() {
+  const svc = catalog.find((s) => s.id === chosenSvc) || catalog[0] || { price: 5000 };
+  const descVal = $('#cDesc') ? $('#cDesc').value : '';
+  const svcPrice = chosenSvc === 'mission-speciale' ? computeSmartPrice(customDuration, customEffort, descVal) : svc.price;
+  const total = svcPrice + vivresBudget;
+  const el = $('#orderTotalVal');
+  if (el) el.textContent = fcfa(total);
+  const sp = $('#svcPriceVal');
+  if (sp) sp.textContent = fcfa(svcPrice);
+  const bn = $('#brobNetVal');
+  if (bn) bn.textContent = fcfa(Math.round(svcPrice * 0.88));
+}
+
+function setCustomDuration(mins) {
+  customDuration = Number(mins) || 60;
+  render();
+}
+
+function setCustomEffort(eff) {
+  customEffort = eff;
+  render();
+}
+
+function render() {
+  const activeCount = missions.filter((m) => !['completed', 'cancelled'].includes(m.status)).length;
+  $('#app').innerHTML = `
+    <div class="hero">
+      <div class="hrow">
+        <div class="brand">
+          <img src="assets/logo.jpg?v=3" alt="Brobroli">
+          <div><h1>Brobroli</h1><small>Vos corvées & courses du quotidien · Abidjan</small></div>
+        </div>
+        <span class="locpill"><i></i> Cocody Angré</span>
+      </div>
+      <div class="hbanner">
+        <img src="assets/hero.jpg" alt="Brobrosseur Abidjan">
+        <div class="ov">
+          <b>Un Brobrosseur de confiance à votre porte</b>
+          <span>Identité CNI vérifiée · Séquestre Wave & Orange Money</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="trust-bar">
+      <span class="trust-chip">🛡️ Séquestre 100% Garanti</span>
+      <span class="trust-chip">⚡ 12 Brobrosseurs Disponibles</span>
+      <span class="trust-chip">⭐ 4.9/5 Avis Clients</span>
+      <span class="trust-chip">🤝 88% reversés au jeune</span>
+    </div>
+
+    <div class="wrap">
+      ${tab === 'home' ? viewHome() : tab === 'order' ? viewOrder() : viewTrack()}
+    </div>
+    <nav class="tabs">
+      <button class="tab ${tab === 'home' ? 'on' : ''}" onclick="setTab('home')"><i>🏠</i>Services</button>
+      <button class="tab ${tab === 'order' ? 'on' : ''}" onclick="setTab('order')"><i>➕</i>Commander</button>
+      <button class="tab ${tab === 'track' ? 'on' : ''}" onclick="setTab('track')"><i>📡</i>Suivi Course (${activeCount})</button>
+    </nav>`;
+  setTimeout(updateClientMaps, 60);
+}
+
+function viewHome() {
+  const active = missions.find((m) => !['completed', 'cancelled'].includes(m.status));
+  let filtered = activeCategory === 'all' ? catalog : catalog.filter(s => s.group.toLowerCase().includes(activeCategory));
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase().trim();
+    filtered = filtered.filter(s => s.name.toLowerCase().includes(q) || s.group.toLowerCase().includes(q));
+  }
+
+  return `
+    ${active ? `<div class="card" style="border:2px solid var(--g2);background:linear-gradient(135deg,#f0faf3,#e6f7ec);cursor:pointer;box-shadow:var(--shadow)" onclick="setTab('track')">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11.5px;font-weight:900;color:var(--g1);text-transform:uppercase;letter-spacing:.5px">⏳ Course en direct (${active.step}/${active.steps.length})</span>
+        <b style="color:var(--g1);font-size:13px">Suivre en direct →</b>
+      </div>
+      <b style="font-size:16px;display:block;margin-top:6px;font-weight:900">${active.icon} ${esc(active.service_name)}</b>
+      <small style="color:var(--muted);font-size:12.5px;display:block;margin-top:2px">Brobrosseur : <b>${esc(active.brob_name)}</b> (${esc(active.brob_badge)})</small>
+    </div>` : ''}
+
+    <div class="card" style="background:linear-gradient(135deg,#064e26,#0e8a45);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:var(--shadow-lg)" onclick="setTab('order','mission-speciale')">
+      <div>
+        <span style="background:rgba(255,255,255,.22);backdrop-filter:blur(6px);padding:4px 10px;border-radius:99px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.6px">✨ Tarif intelligent sur-mesure</span>
+        <b style="display:block;font-size:17px;margin-top:6px;font-weight:900">Une mission spéciale ? Décrivez-la !</b>
+        <small style="opacity:.92;font-size:12.5px;display:block;margin-top:3px;color:#cbf3d7">Prix juste calculé selon le temps & l'effort (dès 2 500 F)</small>
+      </div>
+      <button class="btn sm" style="background:#f5a30b;color:#072111;font-weight:900;flex-shrink:0;height:38px;padding:0 14px;border-radius:12px;box-shadow:0 6px 16px rgba(245,163,11,.4)">Créer →</button>
+    </div>
+
+    <!-- Quick Search -->
+    <div class="search-box">
+      <span class="ic">🔍</span>
+      <input type="text" placeholder="Rechercher une corvée, un achat, un dépannage..." value="${esc(searchQuery)}" oninput="searchQuery=this.value;render()">
+    </div>
+
+    <div class="sec-t"><span>Catégories Populaires</span><span>Abidjan Cocody</span></div>
+    <div class="filter-pills">
+      <span class="pill ${activeCategory === 'all' ? 'active' : ''}" onclick="setCategory('all')">✨ Tout le catalogue</span>
+      <span class="pill ${activeCategory === 'sur-mesure' ? 'active' : ''}" onclick="setTab('order','mission-speciale')">🎯 Sur-Mesure</span>
+      <span class="pill ${activeCategory === 'courses' ? 'active' : ''}" onclick="setCategory('courses')">🛒 Marché & Vivres</span>
+      <span class="pill ${activeCategory === 'maison' ? 'active' : ''}" onclick="setCategory('maison')">🧹 Ménage & Linge</span>
+      <span class="pill ${activeCategory === 'cuisine' ? 'active' : ''}" onclick="setCategory('cuisine')">🍲 Cuisine</span>
+      <span class="pill ${activeCategory === 'démarches' ? 'active' : ''}" onclick="setCategory('démarches')">📦 Démarches & Plis</span>
+    </div>
+
+    <div class="catgrid">
+      <button class="catcard" onclick="setTab('order','courses-marche')">
+        <img src="assets/cat-marche.jpg" alt="Marché">
+        <div class="cb"><b>🛒 Grand Marché</b><span>5 000 F</span></div>
+      </button>
+      <button class="catcard" onclick="setTab('order','menage')">
+        <img src="assets/cat-menage.jpg" alt="Ménage">
+        <div class="cb"><b>🧹 Ménage & Linge</b><span>6 000 F</span></div>
+      </button>
+      <button class="catcard" onclick="setTab('order','cuisine-sauce')">
+        <img src="assets/cat-cuisine.jpg" alt="Cuisine">
+        <div class="cb"><b>🍲 Cuisine Locale</b><span>8 000 F</span></div>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="sec-t" style="margin-top:0"><span>Prestations sélectionnées (${filtered.length})</span></div>
+      ${filtered.map((s) => `
+        <div class="svc-item">
+          <div class="svc-ic">${s.icon}</div>
+          <div class="svc-info">
+            <b>${esc(s.name)} ${s.popular ? '<span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:6px;font-weight:800;margin-left:4px">🔥 Populaire</span>' : ''}</b>
+            <small>Durée : ~${esc(s.time)} · Brobrosseur vérifié CNI</small>
+          </div>
+          <div class="svc-act">
+            <b>${fcfa(s.price)}</b>
+            <button class="btn sm" onclick="setTab('order','${s.id}')">Choisir</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function viewOrder() {
+  const svc = catalog.find((s) => s.id === chosenSvc) || catalog[0] || { id: 'courses-marche', name: 'Courses au grand marché', price: 5000 };
+  const isCustom = svc.id === 'mission-speciale';
+  const effectivePrice = isCustom ? computeSmartPrice(customDuration, customEffort) : svc.price;
+  const brobNet = Math.round(effectivePrice * 0.88);
+  const total = effectivePrice + vivresBudget;
+
+  return `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <h2 style="font-size:19px;font-weight:900;margin:0">🛍️ Commander un Brobrosseur</h2>
+        <button type="button" class="btn sm" style="background:${isCustom ? 'var(--g1)' : '#fff8eb'};color:${isCustom ? '#fff' : '#9a6200'};border:1px solid #f5a30b;font-size:11px;padding:4px 11px" onclick="chosenSvc='${isCustom ? 'courses-marche' : 'mission-speciale'}';render()">
+          ${isCustom ? '📋 Catalogue standard' : '✨ Mission Sur-Mesure'}
+        </button>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">Tarif garanti et transparent. Vos fonds sont protégés sous séquestre jusqu'à confirmation de votre part.</p>
+      
+      <div class="fl">
+        <label>Prestation demandée</label>
+        <select class="in" id="cSvc" onchange="chosenSvc=this.value;render()">
+          ${catalog.map((s) => `<option value="${s.id}" ${s.id === svc.id ? 'selected' : ''}>${s.icon} ${esc(s.name)} — ${s.id === 'mission-speciale' ? 'Tarif calculé sur-mesure' : 'Forfait : ' + fcfa(s.price)}</option>`).join('')}
+        </select>
+      </div>
+
+      ${isCustom ? `
+        <div class="fl" style="background:linear-gradient(145deg,#f0fbf4,#e5f7ec);padding:16px;border-radius:20px;border:1.5px solid var(--g2);margin-bottom:16px;box-shadow:var(--shadow-sm)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <label style="color:var(--g1);font-weight:900;margin:0;font-size:13px">✨ Configurateur de Mission Sur-Mesure</label>
+            <span style="background:var(--g1);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:99px">Tarif Équilibré</span>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Le tarif est calculé pour être très accessible pour vous tout en motivant le Brobrosseur qui perçoit 88 % net de la prestation.</p>
+          
+          <div style="margin-bottom:12px">
+            <label style="font-size:11.5px;color:var(--ink)">1. Titre ou résumé de votre mission spéciale</label>
+            <input class="in" id="cCustomTitle" placeholder="Ex : Ranger le débarras, récupérer un colis à Adjamé, aide cuisine..." value="${esc(customTitle)}" oninput="customTitle=this.value">
+          </div>
+
+          <div style="margin-bottom:12px">
+            <label style="font-size:11.5px;color:var(--ink)">2. Temps estimé à accorder à la tâche</label>
+            <div class="budget-pills">
+              ${[
+                { m: 30, l: '⏱️ 30 min' },
+                { m: 60, l: '⏱️ 1h' },
+                { m: 90, l: '⏱️ 1h30' },
+                { m: 120, l: '⏱️ 2h' },
+                { m: 180, l: '⏱️ 3h' },
+                { m: 240, l: '⏱️ 4h (Demi-journée)' }
+              ].map(t => `<span class="bpill ${customDuration === t.m ? 'sel' : ''}" onclick="setCustomDuration(${t.m})">${t.l}</span>`).join('')}
+            </div>
+          </div>
+
+          <div style="margin-bottom:10px">
+            <label style="font-size:11.5px;color:var(--ink)">3. Niveau d'effort / investissement personnel</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:4px">
+              <button type="button" class="bpill ${customEffort === 'leger' ? 'sel' : ''}" style="text-align:center;padding:9px 4px" onclick="setCustomEffort('leger')">
+                🙂 <b>Léger</b><br><small style="font-size:10px;opacity:.85">Course simple, attente</small>
+              </button>
+              <button type="button" class="bpill ${customEffort === 'modere' ? 'sel' : ''}" style="text-align:center;padding:9px 4px" onclick="setCustomEffort('modere')">
+                ⚡ <b>Modéré</b><br><small style="font-size:10px;opacity:.85">Rangement, démarches</small>
+              </button>
+              <button type="button" class="bpill ${customEffort === 'intense' ? 'sel' : ''}" style="text-align:center;padding:9px 4px" onclick="setCustomEffort('intense')">
+                💪 <b>Soutenu</b><br><small style="font-size:10px;opacity:.85">Charges, grand effort</small>
+              </button>
+            </div>
+          </div>
+
+          <div style="background:#fff;border-radius:14px;padding:12px 14px;border:1px solid #c2eccf;display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div>
+              <b style="font-size:13px;color:var(--g1);display:block">Tarif calculé : <span id="svcPriceVal">${fcfa(effectivePrice)}</span></b>
+              <small style="font-size:11.5px;color:var(--muted)">Dont <b style="color:var(--g1)" id="brobNetVal">${fcfa(brobNet)}</b> reversés net au Brobrosseur (88 %)</small>
+            </div>
+            <span style="font-size:11px;font-weight:900;color:#9a6200;background:#fff3dc;padding:5px 9px;border-radius:8px">🤝 Gagnant-Gagnant</span>
+          </div>
+        </div>
+      ` : ''}
+
+      ${(svc.kind === 'courses' || isCustom) ? `
+        <div class="fl" style="background:#f4f8f5;padding:14px;border-radius:18px;border:1.5px solid #c2eccf">
+          <label style="color:var(--g1);font-weight:900">🛒 Budget achats vivres / provisions (si achats à effectuer)</label>
+          <p style="font-size:11.5px;color:var(--muted);margin-bottom:8px">0 % de commission sur les vivres. La monnaie exacte et le ticket vous sont remis à la livraison.</p>
+          <div class="budget-pills">
+            <span class="bpill ${vivresBudget === 0 ? 'sel' : ''}" data-v="0" onclick="setVivresBudget(0)">0 F (Prestation seule)</span>
+            <span class="bpill ${vivresBudget === 5000 ? 'sel' : ''}" data-v="5000" onclick="setVivresBudget(5000)">5 000 F</span>
+            <span class="bpill ${vivresBudget === 10000 ? 'sel' : ''}" data-v="10000" onclick="setVivresBudget(10000)">10 000 F</span>
+            <span class="bpill ${vivresBudget === 15000 ? 'sel' : ''}" data-v="15000" onclick="setVivresBudget(15000)">15 000 F</span>
+            <span class="bpill ${vivresBudget === 20000 ? 'sel' : ''}" data-v="20000" onclick="setVivresBudget(20000)">20 000 F</span>
+          </div>
+          <input class="in" id="cVivresIn" type="number" placeholder="Ou entrez un montant personnalisé (ex : 12000)" value="${vivresBudget || ''}" oninput="vivresBudget=Math.max(0,Number(this.value)||0);updateOrderTotal()">
+        </div>
+      ` : ''}
+
+      <div class="fl"><label>Votre nom complet</label><input class="in" id="cName" value="Mme Koné"></div>
+      <div class="fl"><label>Téléphone WhatsApp</label><input class="in" id="cTel" value="07 08 09 10 11"></div>
+      <div class="fl"><label>Quartier & Adresse de livraison</label><input class="in" id="cAddr" value="Cocody Angré 8e tranche"></div>
+      <div class="fl"><label>Repère précis (Pharmacie, carrefour, portail)</label><input class="in" id="cLand" value="Après le carrefour Bluetooth, portail vert"></div>
+      
+      <div class="fl">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <label style="margin-bottom:0">${isCustom ? 'Décrivez librement la tâche demandée' : 'Détail des corvées ou liste des vivres'}</label>
+          <button type="button" class="btn sm" style="height:30px;padding:0 12px;font-size:11.5px;background:#e8f7ee;color:var(--g1);border:1px solid var(--g2);border-radius:99px" id="voiceBtn" onclick="toggleVoiceDictation()">🎙️ Dicter à la voix</button>
+        </div>
+        <textarea class="in" id="cDesc" oninput="updateOrderTotal()" placeholder="Décrivez précisément votre besoin (ou dictez-le à la voix)...">${isCustom ? 'J\'ai besoin d\'un Brobrosseur sérieux pour m\'aider à trier et ranger des affaires à la maison.' : '2 tas de tomates fraîches, gombo, 500 F de piment vert, poisson fumé'}</textarea>
+      </div>
+
+      <!-- Mode de paiement sous séquestre -->
+      <div class="fl">
+        <label>Mode de règlement sécurisé</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button type="button" class="btn ${paymentMethod === 'wave' ? 'wave' : 'ghost'}" style="${paymentMethod !== 'wave' ? 'background:#f0f4f1;color:var(--ink);box-shadow:none' : ''}" onclick="setPaymentMethod('wave')">🌊 Wave Money</button>
+          <button type="button" class="btn ${paymentMethod === 'orange_money' ? 'om' : 'ghost'}" style="${paymentMethod !== 'orange_money' ? 'background:#f0f4f1;color:var(--ink);box-shadow:none' : ''}" onclick="setPaymentMethod('orange_money')">🟠 Orange Money</button>
+        </div>
+      </div>
+
+      <div style="background:#e8f7ee;border-radius:18px;padding:14px;margin-bottom:16px;border:1px solid #c2eccf">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;margin-bottom:4px">
+          <span>Forfait Prestation (${isCustom ? `${customDuration} min · effort ${customEffort}` : 'Fixe'}) :</span>
+          <b>${fcfa(effectivePrice)}</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:4px;color:var(--muted)">
+          <span>💪 Rémunération nette du Brobrosseur (88 %) :</span>
+          <b>${fcfa(brobNet)}</b>
+        </div>
+        ${vivresBudget > 0 ? `
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;margin-bottom:4px;color:#0e5c2d">
+            <span>Avance achats / vivres (0 % commission) :</span>
+            <b>+ ${fcfa(vivresBudget)}</b>
+          </div>
+        ` : ''}
+        <div style="border-top:1px dashed #bce4ca;padding-top:8px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+          <div><b style="font-size:14px;color:var(--g1)">🔒 Total Séquestre Garanti</b><small style="display:block;color:var(--muted);font-size:11.5px">Débloqué uniquement après votre vérification</small></div>
+          <b style="font-size:22px;color:var(--g1);font-weight:900" id="orderTotalVal">${fcfa(total)}</b>
+        </div>
+      </div>
+
+      <button class="btn block" onclick="submitOrder()">🚀 Payer sous séquestre & Lancer la mission</button>
+    </div>`;
+}
+
+let speechRec = null;
+function toggleVoiceDictation() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast('🎙️ Parlez distinctement sur Chrome ou Safari mobile');
+  if (speechRec) {
+    try { speechRec.stop(); } catch(e) {}
+    speechRec = null;
+    $('#voiceBtn').textContent = '🎙️ Dicter à la voix';
+    return;
+  }
+  try {
+    speechRec = new SR();
+    speechRec.lang = 'fr-FR';
+    speechRec.continuous = false;
+    speechRec.interimResults = true;
+    speechRec.onstart = () => { $('#voiceBtn').textContent = '🔴 En écoute…'; toast('🎙️ Parlez maintenant, dictez votre liste…'); };
+    speechRec.onresult = (e) => {
+      const text = Array.from(e.results).map(r => r[0].transcript).join('');
+      if (text) $('#cDesc').value = text;
+    };
+    speechRec.onerror = () => { $('#voiceBtn').textContent = '🎙️ Dicter à la voix'; speechRec = null; };
+    speechRec.onend = () => { $('#voiceBtn').textContent = '🎙️ Dicter à la voix'; speechRec = null; toast('✅ Liste enregistrée !'); };
+    speechRec.start();
+  } catch(e) { toast('Microphone non disponible'); }
+}
+
+async function submitOrder() {
+  const svcId = $('#cSvc').value;
+  const isCustom = svcId === 'mission-speciale';
+  const descVal = $('#cDesc').value;
+  const body = {
+    service_id: svcId,
+    custom_title: isCustom ? (customTitle || 'Mission Spéciale Sur-Mesure') : undefined,
+    duration_mins: isCustom ? customDuration : undefined,
+    effort_level: isCustom ? customEffort : undefined,
+    price: isCustom ? computeSmartPrice(customDuration, customEffort, descVal) : undefined,
+    budget_vivres: vivresBudget,
+    payment_method: paymentMethod,
+    client_name: $('#cName').value,
+    client_phone: $('#cTel').value,
+    address: $('#cAddr').value,
+    landmark: $('#cLand').value,
+    description: descVal,
+  };
+  
+  toast(`Paiement séquestre ${paymentMethod === 'wave' ? 'Wave' : 'Orange Money'} en cours…`);
+  try {
+    const r = await fetch(API_BASE + '/api/client/missions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json();
+    if (!r.ok) return toast(j.error || 'Erreur');
+    toast('🎉 Commande validée sous séquestre & envoyée au Brobrosseur !');
+    await load();
+  } catch (e) {
+    const svc = catalog.find(s => s.id === svcId) || catalog[0];
+    const p = body.price || svc.price;
+    const localM = {
+      id: 'm' + Date.now(), ref: 'BR-' + Math.floor(1000 + Math.random() * 9000),
+      service_name: body.custom_title ? '✨ ' + body.custom_title : svc.name, icon: isCustom ? '✨' : svc.icon,
+      price: p, budget_vivres: vivresBudget, status: 'in_progress', step: 1,
+      steps: [{ key: 'accepted', icon: '✅', label: 'Mission acceptée' }, { key: 'enroute', icon: '🚶', label: 'En route' }, { key: 'working', icon: '🛒', label: 'En cours' }, { key: 'delivered', icon: '🎉', label: 'Livré au client' }],
+      steps_log: [{ key: 'accepted', at: Date.now() }],
+      brob_name: 'Aminata Koné', brob_phone: '0700000001', brob_rating: 4.9, brob_ratings_count: 128, brob_badge: '🏆 Expert Agréé',
+      chat_messages: [{ sender: 'system', text: 'Mission créée et assignée à Aminata Koné' }]
+    };
+    missions.unshift(localM);
+    try { localStorage.setItem('bro_standalone_missions', JSON.stringify(missions)); } catch (_) {}
+    toast('🎉 Commande validée & assignée !');
+  }
+  setTab('track');
+}
+
+function viewTrack() {
+  if (!missions.length) return `<div class="card" style="text-align:center;padding:36px 16px"><h2>Aucune course en cours</h2><p style="color:var(--muted);margin:8px 0 16px">Commandez une prestation pour suivre votre Brobrosseur en direct.</p><button class="btn" onclick="setTab('order')">Commander maintenant</button></div>`;
+  return missions.map((m) => {
+    const done = m.step, total = m.steps.length;
+    const curStep = m.step > 0 ? m.steps[m.step - 1] : null;
+    const phoneClean = (m.brob_phone || '0700000001').replace(/\D/g, '');
+    const chatMsgs = m.chat_messages || [];
+
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <span style="font-size:11.5px;font-weight:900;color:var(--g1);text-transform:uppercase;letter-spacing:.5px">${esc(m.ref)} · ${m.status === 'completed' ? '✅ Terminée' : m.status === 'delivered' ? '🎉 Livrée à votre porte' : '📡 Suivi en direct'}</span>
+          <h3 style="font-size:18px;font-weight:900;margin-top:3px">${m.icon} ${esc(m.service_name)}</h3>
+        </div>
+        <div style="text-align:right">
+          <b style="font-size:18px;color:var(--g1);font-weight:900">${fcfa(m.price + (m.budget_vivres || 0))}</b>
+          ${m.budget_vivres > 0 ? `<small style="display:block;font-size:11px;color:var(--muted)">dont ${fcfa(m.budget_vivres)} vivres</small>` : ''}
+        </div>
+      </div>
+
+      <!-- Fiche Prestataire & Contact Direct -->
+      <div style="margin-top:12px;padding:14px;border-radius:18px;background:#f4f8f5;font-size:13px;border:1px solid #d4e8db">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <span style="font-size:14px">🧑‍🔧 <b>${esc(m.brob_name)}</b></span>
+            <small style="display:block;color:var(--muted);font-size:12px;margin-top:1px">⭐ <b>${Number(m.brob_rating || 4.9).toFixed(1)}/5</b> (${m.brob_ratings_count || 48} avis)</small>
+          </div>
+          <div style="display:flex;gap:6px">
+            <a href="tel:${phoneClean}" class="btn sm" style="height:32px;padding:0 10px;background:#091d12" title="Appeler">📞 Appeler</a>
+            <a href="https://wa.me/225${phoneClean}?text=Bonjour%20${encodeURIComponent(m.brob_name)}%2C%20concernant%20la%20course%20Brobroli%20${m.ref}" target="_blank" class="btn sm" style="height:32px;padding:0 10px;background:#1ebd5c" title="WhatsApp">💬 WhatsApp</a>
+            <a href="${API_BASE}/badge?id=${m.brob_id || 'b-demo'}" target="_blank" class="btn sm ghost" style="height:32px;padding:0 10px;background:#fff;border:1.5px solid #c2eccf;color:var(--g1);font-weight:800" title="Voir le Badge">🪪 Badge</a>
+          </div>
+        </div>
+
+        ${(m.brob_certifications && m.brob_certifications.length) ? `
+          <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #dbe8df;display:flex;gap:5px;flex-wrap:wrap">
+            ${m.brob_certifications.map(c => `
+              <span style="font-size:10.5px;font-weight:800;background:#fff;color:#0a6b34;border:1px solid #bce4ca;padding:3px 8px;border-radius:99px" title="${esc(c.desc)}">
+                ${c.icon} ${esc(c.name)}
+              </span>
+            `).join('')}
+          </div>` : ''}
+      </div>
+
+      <!-- CARTE GPS EN DIRECT (SUIVI DU BROBROSSEUR) -->
+      <div style="margin:14px 0;border-radius:20px;overflow:hidden;border:2px solid #2ee07f;box-shadow:var(--shadow-sm);position:relative">
+        <div style="background:linear-gradient(90deg,#064e26,#0d7d3f);color:#fff;padding:8px 14px;font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:6px"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#2ee07f;box-shadow:0 0 8px #2ee07f;animation:dotpulse 1.8s infinite"></i> RADAR GPS EN DIRECT</span>
+          <span style="color:#2ee07f;font-weight:900" id="etaTime-${m.id}">${m.dist_to_dest ? '⏳ Arrivée dans ~' + Math.max(3, Math.round(m.dist_to_dest / 350)) + ' min' : '🏍️ Coursier en mouvement'}</span>
+        </div>
+        <div id="clientMap-${m.id}" style="width:100%;height:220px;background:#e5ece7"></div>
+        <div style="background:#fff;padding:8px 12px;font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;align-items:center">
+          <span>📍 Destination : <b>${esc(m.address || 'Cocody Angré')}</b></span>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${m.dest ? m.dest.lat + ',' + m.dest.lon : encodeURIComponent(m.address || 'Cocody Angré')}" target="_blank" rel="noopener" style="color:var(--g1);font-weight:800;text-decoration:none">Ouvrir l'itinéraire ↗</a>
+        </div>
+      </div>
+
+      <div class="stepbar">${m.steps.map((s, i) => `<i class="${i < done ? 'd' : i === done && m.status !== 'completed' ? 'c' : ''}"></i>`).join('')}</div>
+      <div style="font-size:13.5px;font-weight:900;color:var(--g1);margin-bottom:8px">
+        Étape (${done}/${total}) : ${m.status === 'delivered' ? '🎉 Livré à votre porte — En attente de votre note' : m.status === 'completed' ? '✅ Course validée' : curStep ? curStep.icon + ' ' + esc(curStep.label) : '⏳ En attente'}
+      </div>
+
+      <!-- Chat Direct dans la course -->
+      <div class="chat-box">
+        <div style="font-size:11.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">💬 Messagerie avec votre Brobrosseur</div>
+        <div class="chat-msgs" id="chatMsgs-${m.id}">
+          ${chatMsgs.length ? chatMsgs.map(msg => `
+            <div class="cmsg ${msg.sender}">${msg.sender === 'client' ? 'Vous : ' : msg.sender === 'brob' ? esc(m.brob_name) + ' : ' : ''}${esc(msg.text)}</div>
+          `).join('') : '<div class="cmsg system">Début de la conversation sécurisée</div>'}
+        </div>
+        <div class="quick-replies">
+          <span class="qr-chip" onclick="sendQuickReply('${m.id}','Je suis à la maison 👍')">Je suis là 👍</span>
+          <span class="qr-chip" onclick="sendQuickReply('${m.id}','Prends plutôt les tomates fraîches 🍅')">Tomates fraîches 🍅</span>
+          <span class="qr-chip" onclick="sendQuickReply('${m.id}','Portail vert après le carrefour 🏠')">Portail vert 🏠</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <input class="in" style="height:38px;font-size:13px" id="chatInput-${m.id}" placeholder="Écrire un message…" onkeydown="if(event.key==='Enter')sendChat('${m.id}')">
+          <button class="btn sm" onclick="sendChat('${m.id}')">Envoyer</button>
+        </div>
+      </div>
+
+      <div class="slist">
+        ${m.steps.map((s, i) => {
+          const lg = (m.steps_log || []).find((l) => l.key === s.key);
+          const cls = i < done ? 'done' : i === done && m.status !== 'completed' ? 'cur' : '';
+          return `<div class="srow ${cls}"><span>${i < done ? '✅' : i === done ? '⏳' : s.icon}</span><span>${i + 1}. ${esc(s.label)}</span>${lg ? `<time>${hhmm(lg.at)}</time>` : ''}</div>`;
+        }).join('')}
+      </div>
+
+      ${m.status === 'delivered' ? `
+        <div style="margin-top:16px;padding:14px;background:#fff8eb;border:1.5px solid #ffd27d;border-radius:18px;box-shadow:var(--shadow-sm)">
+          <b style="color:#8a5600;font-size:14px;display:block">🎉 Votre commande est arrivée !</b>
+          <p style="font-size:12.5px;color:#5c3a00;margin:5px 0 12px">Vérifiez les articles remis et notez votre Brobrosseur pour libérer le paiement sous séquestre.</p>
+          <button class="btn amber block" onclick="openRateModal('${m.id}', '${esc(m.brob_name)}', '${esc(m.service_name)}')">⭐ Évaluer la prestation & Valider</button>
+        </div>` : ''}
+
+      ${m.status === 'completed' && m.rating ? `
+        <div style="margin-top:14px;padding:14px;background:#f0fbf4;border:1.5px solid #c2eccf;border-radius:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <b style="color:var(--g1);font-size:13.5px">⭐ Votre avis client enregistré</b>
+            <span style="font-size:15px;color:#d49000">${'⭐'.repeat(m.rating)} <b>${m.rating}/5</b></span>
+          </div>
+          ${m.review ? `<p style="font-size:13px;color:var(--ink);margin-top:6px;font-style:italic">« ${esc(m.review)} »</p>` : ''}
+          ${m.tags && m.tags.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${m.tags.map(t => `<span style="font-size:11px;background:#fff;padding:3px 9px;border-radius:99px;border:1px solid #bde6cb;color:var(--g1);font-weight:700">${esc(t)}</span>`).join('')}</div>` : ''}
+        </div>` : ''}
+
+      ${m.status === 'completed' && !m.rating ? `
+        <button class="btn block sm" style="margin-top:14px;background:#fff;color:var(--g1);border:1.5px solid var(--g2);box-shadow:none;height:42px" onclick="openRateModal('${m.id}', '${esc(m.brob_name)}', '${esc(m.service_name)}')">⭐ Laisser une note & un avis sur cette course</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function sendChat(missionId) {
+  const inp = $('#chatInput-' + missionId);
+  if (!inp || !inp.value.trim()) return;
+  const text = inp.value.trim();
+  inp.value = '';
+  try {
+    await fetch(`${API_BASE}/api/missions/${missionId}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sender: 'client', text })
+    });
+    load();
+  } catch(e) {
+    const m = missions.find(x => x.id === missionId);
+    if (m) { (m.chat_messages = m.chat_messages || []).push({ sender: 'client', text }); render(); }
+  }
+}
+
+async function sendQuickReply(missionId, text) {
+  try {
+    await fetch(`${API_BASE}/api/missions/${missionId}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sender: 'client', text })
+    });
+    load();
+  } catch(e) {
+    const m = missions.find(x => x.id === missionId);
+    if (m) { (m.chat_messages = m.chat_messages || []).push({ sender: 'client', text }); render(); }
+  }
+}
+
+let activeRateMissionId = null;
+let currentRatingValue = 5;
+
+const RATING_LABELS = {
+  1: "😞 1/5 — Prestation très décevante",
+  2: "😐 2/5 — Prestation médiocre / retards",
+  3: "🙂 3/5 — Prestation correcte",
+  4: "😊 4/5 — Très bonne prestation !",
+  5: "🌟 5/5 — Prestation Parfaite & Impeccable !"
+};
+
+function openRateModal(id, brobName, svcName) {
+  activeRateMissionId = id;
+  $('#rmBrobName').textContent = 'Notez ' + (brobName || 'votre Brobrosseur');
+  $('#rmSvcName').textContent = 'Mission : ' + (svcName || 'Prestation réalisée');
+  setRating(5);
+  $('#rateComment').value = '';
+  $$('.tag-chip').forEach((c, idx) => c.classList.toggle('sel', idx < 3));
+  $('#rateModal').classList.add('show');
+}
+
+function closeRateModal() {
+  $('#rateModal').classList.remove('show');
+  activeRateMissionId = null;
+}
+
+function setRating(val) {
+  currentRatingValue = val;
+  $$('.star-btn').forEach(btn => {
+    const v = Number(btn.dataset.v);
+    btn.classList.toggle('active', v <= val);
+  });
+  $('#starLabel').textContent = RATING_LABELS[val] || '';
+}
+
+function toggleTag(el) {
+  el.classList.toggle('sel');
+}
+
+async function submitRating() {
+  if (!activeRateMissionId) return;
+  const tags = Array.from($$('#rateModal .tag-chip.sel')).map(c => c.textContent.trim());
+  const review = $('#rateComment').value.trim();
+  const body = { rating: currentRatingValue, review, tags };
+
+  try {
+    const r = await fetch(`${API_BASE}/api/client/missions/${activeRateMissionId}/rate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const j = await r.json();
+    if (!r.ok) return toast(j.error || 'Erreur lors de la notation');
+    closeRateModal();
+    toast(`🎉 Merci ! Note ${currentRatingValue}/5 enregistrée & paiement libéré.`);
+    await load();
+  } catch (e) {
+    const m = missions.find(x => x.id === activeRateMissionId);
+    if (m) { m.status = 'completed'; m.rating = currentRatingValue; m.review = review; m.tags = tags; }
+    closeRateModal();
+    toast(`🎉 Merci ! Note ${currentRatingValue}/5 enregistrée.`);
+    render();
+  }
+}
+
+const clientMaps = {};
+function updateClientMaps() {
+  if (tab !== 'track') return;
+  missions.forEach(m => {
+    const el = document.getElementById('clientMap-' + m.id);
+    if (!el || typeof L === 'undefined') return;
+    if (clientMaps[m.id]) {
+      try { clientMaps[m.id].map.remove(); } catch(e) {}
+      delete clientMaps[m.id];
+    }
+    try {
+      const map = L.map(el, { zoomControl: false, attributionControl: false }).setView([5.3585, -3.985], 14);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+      const cm = {
+        map: map,
+        trail: L.polyline([], { color: '#0e8a45', weight: 4, opacity: 0.8 }).addTo(map),
+        brobMarker: null,
+        destMarker: null
+      };
+      clientMaps[m.id] = cm;
+
+      const brobPos = (m.track && m.track.lat) ? [m.track.lat, m.track.lon] : [5.3565, -3.9862];
+      const destPos = (m.dest && m.dest.lat) ? [m.dest.lat, m.dest.lon] : [5.3610, -3.9840];
+
+      const brobIcon = L.divIcon({ className: 'custom-brob-pin', html: '<div style="background:#064e26;color:#fff;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;border:2.5px solid #2ee07f;box-shadow:0 4px 12px rgba(0,0,0,0.4)">🏍️</div>', iconSize: [34, 34], iconAnchor: [17, 17] });
+      cm.brobMarker = L.marker(brobPos, { icon: brobIcon }).addTo(cm.map).bindTooltip(m.brob_name || 'Brobrosseur', { permanent: true, direction: 'top', offset: [0, -18] });
+
+      const destIcon = L.divIcon({ className: 'custom-dest-pin', html: '<div style="background:#e53935;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:15px;border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,0.3)">🏠</div>', iconSize: [30, 30], iconAnchor: [15, 15] });
+      cm.destMarker = L.marker(destPos, { icon: destIcon }).addTo(cm.map).bindTooltip('Vous', { permanent: true, direction: 'top', offset: [0, -16] });
+
+      if (m.trail && m.trail.length) {
+        cm.trail.setLatLngs(m.trail.map(p => [p[0], p[1]]));
+      }
+
+      try {
+        const group = L.featureGroup([cm.brobMarker, cm.destMarker]);
+        cm.map.fitBounds(group.getBounds().pad(0.25));
+      } catch(e) {}
+      setTimeout(() => { try { cm.map.invalidateSize(); } catch(_) {} }, 100);
+    } catch(err) {
+      console.warn('Erreur initialisation Leaflet client:', err);
+    }
+  });
+}
+
+render();
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brobroli — Studio d'Affiches Réseaux Sociaux & Lancement (TikTok, Facebook, A4)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Cabinet+Grotesk:wght@800;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+    .font-display { font-family: 'Cabinet Grotesk', sans-serif; }
+    .font-code { font-family: 'Space Grotesk', monospace; }
+
+    :root {
+      --g1: #0a6b34;
+      --g2: #12a150;
+      --neon: #2ee07f;
+      --gold: #f5a30b;
+      --dark: #08120c;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 10%, #0d2818 0%, #050b07 60%, #020403 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 14px 60px;
+      overflow-x: hidden;
+    }
+
+    /* ── Barre d'Outils Studio Réseaux Sociaux ── */
+    .studio-bar {
+      position: sticky;
+      top: 14px;
+      z-index: 50;
+      background: rgba(10, 24, 15, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(46, 224, 127, 0.35);
+      border-radius: 99px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 16px 36px -10px rgba(0,0,0,0.7), 0 0 20px rgba(46, 224, 127, 0.15);
+      max-width: 95vw;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+
+    .studio-btn {
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      color: #b8d4c3;
+      background: transparent;
+    }
+    .studio-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .studio-btn.active {
+      background: linear-gradient(135deg, #0a6b34, #189b4f);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(46, 224, 127, 0.4);
+      border: 1px solid rgba(46, 224, 127, 0.6);
+    }
+    .action-btn {
+      background: linear-gradient(135deg, #f5a30b, #ff7a18);
+      color: #000;
+      font-weight: 900;
+      box-shadow: 0 4px 15px rgba(245, 163, 11, 0.4);
+    }
+    .action-btn:hover {
+      background: #ffb833;
+      transform: translateY(-1px);
+    }
+
+    /* ── Conteneur du Poster avec transitions de format ── */
+    #posterWrap {
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .poster-canvas {
+      background: #09150e;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 30px 100px -20px rgba(0, 0, 0, 0.95), 0 0 60px -10px rgba(46, 224, 127, 0.25);
+      border: 2px solid rgba(46, 224, 127, 0.4);
+      transition: all 0.35s ease;
+      color: #fff;
+    }
+
+    /* ── FORMAT 1 : TIKTOK & REELS & STORIES (9:16 VERTICAL IMPACT) ── */
+    .mode-tiktok .poster-canvas {
+      width: 410px;
+      min-height: 740px;
+      border-radius: 40px;
+      padding: 24px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ── FORMAT 2 : FACEBOOK & INSTAGRAM CARRE (1:1 FEED) ── */
+    .mode-facebook .poster-canvas {
+      width: 540px;
+      min-height: 540px;
+      border-radius: 32px;
+      padding: 26px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ── FORMAT 3 : PAYSAGE / BANNIÈRE FACEBOOK & WEB (16:9) ── */
+    .mode-landscape .poster-canvas {
+      width: 760px;
+      min-height: 480px;
+      border-radius: 28px;
+      padding: 26px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ── FORMAT 4 : FLYER A4 IMPRIMABLE AVEC TALONS ── */
+    .mode-flyer .poster-canvas {
+      width: 580px;
+      min-height: 820px;
+      border-radius: 20px;
+      padding: 28px 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ── Éléments de Décoration & Badges ── */
+    .neon-badge {
+      background: rgba(46, 224, 127, 0.14);
+      border: 1px solid rgba(46, 224, 127, 0.45);
+      color: #34d27b;
+      backdrop-filter: blur(8px);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fire-badge {
+      background: linear-gradient(135deg, rgba(245, 163, 11, 0.2), rgba(255, 74, 74, 0.2));
+      border: 1px solid rgba(245, 163, 11, 0.5);
+      color: #ffb833;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      animation: pulseFire 2s infinite;
+    }
+    @keyframes pulseFire {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 163, 11, 0.5); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 163, 11, 0); }
+    }
+
+    .service-card {
+      background: rgba(14, 28, 19, 0.75);
+      border: 1px solid rgba(46, 224, 127, 0.25);
+      border-radius: 18px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .service-card:hover {
+      transform: translateY(-2px);
+      border-color: #2ee07f;
+      background: rgba(18, 38, 25, 0.85);
+    }
+
+    .tiktok-ui-sidebar {
+      position: absolute;
+      right: 14px;
+      bottom: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      z-index: 30;
+    }
+    .tt-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .tt-btn span {
+      font-size: 10px;
+      font-weight: 800;
+      color: #d1e2d7;
+    }
+    .tt-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid #2ee07f;
+      overflow: hidden;
+      position: relative;
+    }
+    .tt-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .tt-plus {
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 18px;
+      background: #e5484d;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    /* ── Talons Détachables pour Flyer A4 ── */
+    .tear-tabs {
+      display: none;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      border-top: 2px dashed rgba(255, 255, 255, 0.35);
+      padding-top: 10px;
+      margin-top: 14px;
+    }
+    .mode-flyer .tear-tabs {
+      display: grid;
+    }
+    .tear-tab {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(46, 224, 127, 0.3);
+      border-radius: 8px;
+      padding: 6px 2px;
+      text-align: center;
+      font-size: 9px;
+      line-height: 1.2;
+    }
+
+    /* ── Impression Optimisée A4 ── */
+    @media print {
+      body {
+        background: #fff !important;
+        padding: 0 !important;
+        color: #000 !important;
+      }
+      .studio-bar, .social-caption-box, .links-bar {
+        display: none !important;
+      }
+      #posterWrap {
+        width: 100% !important;
+      }
+      .poster-canvas {
+        box-shadow: none !important;
+        border: 1px solid #111 !important;
+        background: #09150e !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        width: 100% !important;
+        max-width: 210mm !important;
+        min-height: 297mm !important;
+        border-radius: 0 !important;
+      }
+    }
+
+    /* ── Boîte Légende Prête à Poster ── */
+    .social-caption-box {
+      margin-top: 34px;
+      width: 100%;
+      max-width: 680px;
+      background: rgba(12, 28, 18, 0.85);
+      border: 1.5px solid rgba(46, 224, 127, 0.3);
+      border-radius: 24px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="mode-tiktok">
+
+<!-- BARRE DE COMMANDE DU STUDIO MULTI-FORMATS -->
+<div class="studio-bar">
+  <button class="studio-btn active" id="btnTikTok" onclick="setMode('tiktok')">
+    <span>📱</span> TikTok / Reels (9:16)
+  </button>
+  <button class="studio-btn" id="btnFacebook" onclick="setMode('facebook')">
+    <span>🟦</span> Facebook / Insta (1:1)
+  </button>
+  <button class="studio-btn" id="btnLandscape" onclick="setMode('landscape')">
+    <span>📰</span> Bannière / Web (16:9)
+  </button>
+  <button class="studio-btn" id="btnFlyer" onclick="setMode('flyer')">
+    <span>📄</span> Flyer A4 Découpable
+  </button>
+  <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 4px;"></div>
+  <button class="studio-btn action-btn" onclick="downloadPosterImage()">
+    <span>📸</span> Télécharger Image HD (PNG)
+  </button>
+  <button class="studio-btn" style="background:rgba(255,255,255,0.1);color:#fff" onclick="window.print()">
+    <span>🖨️</span> Imprimer
+  </button>
+</div>
+
+<!-- LE POSTER DYNAMIQUE RESPONSIVE -->
+<div id="posterWrap">
+  <div class="poster-canvas" id="posterArea">
+    
+    <!-- Halos d'ambiance ultra-vibrants -->
+    <div class="absolute -top-20 -right-20 w-60 h-60 bg-emerald-500/25 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- EN-TÊTE : LOGO + LOCALISATION + STATUT -->
+    <div class="relative z-10 flex items-center justify-between mb-3.5">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-lg shadow-emerald-950 flex-shrink-0 bg-white">
+          <img src="Visuels_et_Logo/logo.jpg" onerror="this.onerror=null;this.src='/assets/logo.jpg';this.onerror=function(){this.src='backend/public/assets/logo.jpg'};" alt="Logo Brobroli" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-black text-2xl text-white tracking-tight leading-none">Brobroli</span>
+            <span class="bg-emerald-500 text-slate-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-full">Officiel</span>
+          </div>
+          <p class="text-[11.5px] text-emerald-300 font-semibold mt-0.5">L'App N°1 des Courses & Services à Abidjan</p>
+        </div>
+      </div>
+      <div class="text-right flex-shrink-0">
+        <span class="neon-badge">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          Cocody · Angré
+        </span>
+      </div>
+    </div>
+
+    <!-- ACCROCHE CHOC / TITRE IMPACT TIKTOK & FACEBOOK -->
+    <div class="relative z-10 my-2">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="fire-badge">🔥 NOUVEAU À ABIDJAN</span>
+        <span class="text-[11px] text-amber-300 font-bold">⭐ 4.9/5 (+650 avis)</span>
+      </div>
+      <h1 class="font-display font-black text-2xl sm:text-3xl leading-[1.18] text-white">
+        Fini la galère du marché le samedi matin ! <br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-green-300 to-amber-300">
+          Votre Brobrosseur s'en charge en 45 min.
+        </span>
+      </h1>
+      <p class="text-xs text-slate-300 font-medium mt-2 leading-relaxed">
+        Confiez vos <strong>courses de vivres frais, ménage et démarches</strong> aux jeunes vérifiés de votre quartier. Zéro embouteillage, ticket et monnaie exacte à votre porte.
+      </p>
+    </div>
+
+    <!-- BANNIÈRE PHOTO HERO BROBROSSEUR ABIDJAN -->
+    <div class="relative z-10 my-3 rounded-2xl overflow-hidden border border-emerald-500/40 shadow-xl max-h-36 h-36 flex-shrink-0">
+      <img src="Visuels_et_Logo/hero.jpg" onerror="this.onerror=null;this.src='/assets/hero.jpg';this.onerror=function(){this.src='backend/public/assets/hero.jpg'};" alt="Brobrosseur en mission" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end justify-between p-3">
+        <span class="text-xs font-bold text-white flex items-center gap-1.5">
+          🛡️ Prestataires vérifiés CNI & Casier judiciaire
+        </span>
+        <span class="text-[10px] bg-emerald-500/90 text-black font-black px-2 py-1 rounded-lg uppercase">
+          Suivi GPS Direct
+        </span>
+      </div>
+    </div>
+
+    <!-- LES 3 SERVICES PHARES AVEC TARIFS RÉELS (FORFAIT TRANSPARENT) -->
+    <div class="relative z-10 space-y-2 my-2.5">
+      <!-- Service 1 : Marché -->
+      <div class="service-card">
+        <div class="flex items-center gap-3">
+          <img src="Visuels_et_Logo/cat-marche.jpg" onerror="this.onerror=null;this.src='/assets/cat-marche.jpg';" alt="Marché" class="w-11 h-11 rounded-xl object-cover border border-emerald-500/40 flex-shrink-0">
+          <div>
+            <div class="font-black text-xs text-white">🛒 Courses au Grand Marché</div>
+            <div class="text-[10.5px] text-slate-300">Tomates, gombo frais, poisson fumé, attiéké</div>
+          </div>
+        </div>
+        <div class="text-right pl-2 flex-shrink-0">
+          <div class="text-base font-display font-black text-amber-400">5 000 F</div>
+          <div class="text-[8px] uppercase tracking-wider text-slate-400 font-extrabold">Forfait Fixe</div>
+        </div>
+      </div>
+
+      <!-- Service 2 : Ménage -->
+      <div class="service-card">
+        <div class="flex items-center gap-3">
+          <img src="Visuels_et_Logo/cat-menage.jpg" onerror="this.onerror=null;this.src='/assets/cat-menage.jpg';" alt="Ménage" class="w-11 h-11 rounded-xl object-cover border border-emerald-500/40 flex-shrink-0">
+          <div>
+            <div class="font-black text-xs text-white">🧹 Ménage & Repassage Express</div>
+            <div class="text-[10.5px] text-slate-300">Appartement 2-3 pièces ou pile de linge repassée</div>
+          </div>
+        </div>
+        <div class="text-right pl-2 flex-shrink-0">
+          <div class="text-base font-display font-black text-amber-400">6 000 F</div>
+          <div class="text-[8px] uppercase tracking-wider text-slate-400 font-extrabold">Forfait Fixe</div>
+        </div>
+      </div>
+
+      <!-- Service 3 : Cuisine / Démarches -->
+      <div class="service-card">
+        <div class="flex items-center gap-3">
+          <img src="Visuels_et_Logo/cat-cuisine.jpg" onerror="this.onerror=null;this.src='/assets/cat-cuisine.jpg';" alt="Cuisine" class="w-11 h-11 rounded-xl object-cover border border-emerald-500/40 flex-shrink-0">
+          <div>
+            <div class="font-black text-xs text-white">🍲 Repas Maison & Files d'Attente</div>
+            <div class="text-[10.5px] text-slate-300">Plats ivoiriens, factures CIE/SODECI, colis</div>
+          </div>
+        </div>
+        <div class="text-right pl-2 flex-shrink-0">
+          <div class="text-base font-display font-black text-amber-400">4 000 F</div>
+          <div class="text-[8px] uppercase tracking-wider text-slate-400 font-extrabold">Forfait Fixe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SÉCURITÉ FINANCIÈRE & GARANTIE 100% -->
+    <div class="relative z-10 p-2.5 rounded-2xl bg-gradient-to-r from-emerald-950/90 to-slate-900 border border-emerald-500/35 flex items-center gap-2.5 my-2">
+      <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
+        🔒
+      </div>
+      <div class="text-[11px] leading-snug text-slate-200">
+        <strong class="text-white">Séquestre Garanti :</strong> Vous ne libérez le paiement qu'après vérification de la marchandise à votre porte.
+      </div>
+    </div>
+
+    <!-- SCAN QR CODE + BOUTON D'ACTION IMMÉDIATE -->
+    <div class="relative z-10 p-3 rounded-2xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-between gap-3 my-2">
+      <div class="w-16 h-16 bg-white rounded-xl p-1 flex-shrink-0 shadow-md flex items-center justify-center">
+        <!-- QR Code SVG Scannable -->
+        <svg viewBox="0 0 100 100" fill="#07190e" class="w-full h-full">
+          <rect x="6" y="6" width="32" height="32" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+          <rect x="15" y="15" width="14" height="14" fill="#07190e"/>
+          <rect x="62" y="6" width="32" height="32" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+          <rect x="71" y="15" width="14" height="14" fill="#07190e"/>
+          <rect x="6" y="62" width="32" height="32" rx="4" fill="none" stroke="#07190e" stroke-width="6"/>
+          <rect x="15" y="71" width="14" height="14" fill="#07190e"/>
+          <rect x="44" y="10" width="10" height="20" rx="2"/>
+          <rect x="44" y="38" width="12" height="12" rx="2"/>
+          <rect x="62" y="44" width="20" height="10" rx="2"/>
+          <rect x="44" y="58" width="10" height="32" rx="2"/>
+          <rect x="62" y="62" width="14" height="14" rx="2"/>
+          <rect x="80" y="62" width="12" height="28" rx="2"/>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <b class="text-xs text-white block">Scannez pour commander en 30s</b>
+        <p class="text-[10px] text-slate-300 mt-0.5">Ouvrez votre appareil photo pour lancer l'application Brobroli directement.</p>
+      </div>
+    </div>
+
+    <!-- BOUTON WHATSAPP & PAIEMENTS MOBILE MONEY -->
+    <div class="relative z-10 text-center mt-2">
+      <a href="https://wa.me/2250708091011?text=Bonjour%20Brobroli%2C%20je%20souhaite%20commander%20une%20prestation" target="_blank" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-green-400 to-emerald-400 text-slate-950 font-display font-black text-sm shadow-xl shadow-emerald-950/80 flex items-center justify-center gap-2 cursor-pointer hover:opacity-95 transition no-underline">
+        <span class="text-lg">💬</span> Commander sur WhatsApp : 07 08 09 10 11
+      </a>
+      <div class="flex items-center justify-center gap-3 mt-2 text-[10.5px] text-slate-400 font-bold">
+        <span>Paiements acceptés :</span>
+        <span class="text-blue-400 font-extrabold">🌊 Wave</span>
+        <span class="text-orange-400 font-extrabold">🟠 Orange Money</span>
+        <span class="text-yellow-400 font-extrabold">🟡 MTN MoMo</span>
+      </div>
+    </div>
+
+    <!-- TALONS DÉTACHABLES POUR FORMAT FLYER A4 -->
+    <div class="tear-tabs">
+      <div class="tear-tab"><b>BROBROLI</b><br>07 08 09 10 11<br>Courses Cocody</div>
+      <div class="tear-tab"><b>BROBROLI</b><br>07 08 09 10 11<br>Ménage Angré</div>
+      <div class="tear-tab"><b>BROBROLI</b><br>07 08 09 10 11<br>Courses Cocody</div>
+      <div class="tear-tab"><b>BROBROLI</b><br>07 08 09 10 11<br>Cuisine Repas</div>
+      <div class="tear-tab"><b>BROBROLI</b><br>07 08 09 10 11<br>07 08 09 10 11</div>
+    </div>
+
+    <!-- SIDEBAR OVERLAY STYLE TIKTOK (Masquable en 1 clic) -->
+    <div class="tiktok-ui-sidebar" id="tiktokOverlay">
+      <div class="tt-avatar">
+        <img src="Visuels_et_Logo/logo.jpg" onerror="this.onerror=null;this.src='/assets/logo.jpg';" alt="Brobroli">
+        <div class="tt-plus">+</div>
+      </div>
+      <div class="tt-btn" onclick="toastLike()">
+        <span>❤️</span>
+        <span id="likeCount">28.4K</span>
+      </div>
+      <div class="tt-btn">
+        <span>💬</span>
+        <span>1 420</span>
+      </div>
+      <div class="tt-btn">
+        <span>🔖</span>
+        <span>8.9K</span>
+      </div>
+      <div class="tt-btn">
+        <span>↗️</span>
+        <span>Partager</span>
+      </div>
+      <div class="w-8 h-8 rounded-full border-2 border-slate-700 bg-slate-900 flex items-center justify-center text-xs animate-spin" style="animation-duration: 4s;">
+        🎵
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SECTION LÉGENDE & TEXTE PRÊT À COPIER POUR PUBLICATION FACEBOOK & TIKTOK -->
+<div class="social-caption-box">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">✍️</span>
+      <h3 class="font-bold text-white text-sm">Légende prête à copier pour Facebook & TikTok</h3>
+    </div>
+    <button onclick="copyCaption()" class="px-3.5 py-1.5 rounded-full bg-emerald-500 text-slate-950 font-bold text-xs hover:bg-emerald-400 transition flex items-center gap-1.5 cursor-pointer">
+      <span id="copyIcon">📋</span> <span id="copyText">Copier le texte</span>
+    </button>
+  </div>
+  <textarea id="captionContent" readonly class="w-full h-36 bg-black/40 border border-slate-700 rounded-xl p-3 text-xs text-slate-300 font-mono leading-relaxed outline-none resize-none">
+🚨 ABIDJAN, FINI LA CORVÉE DU MARCHÉ LE SAMEDI ! 🥦🛵
+
+Tu es fatigué(e) de perdre 3h dans les embouteillages d'Angré, la poussière et la chaleur pour trouver des tomates fraîches et du bon poisson ? 🥵
+
+Découvre BROBROLI : l'application qui confie tes courses de marché, ménage et démarches aux Brobrosseurs agréés de ton quartier en 45 min ! ✨
+
+✅ Livreur vérifié CNI & Casier judiciaire
+✅ Sélection rigoureuse de tes vivres au marché (gombo, tomates, piment, attiéké, poisson fumé)
+✅ Monnaie exacte et reçu de caisse remis à ta porte
+✅ Paiement sécurisé sous séquestre Wave & Orange Money (tu ne paies qu'après vérification !)
+
+💬 Commande immédiatement sur WhatsApp : 07 08 09 10 11
+📲 Ou teste l'application directement en 1 clic : http://localhost:5000/client
+
+#Abidjan #Brobroli #Cocody #Angre #Civ225 #Babi #BonsPlansAbidjan #CoteDIvoire #CoursesAbidjan #StartupCamerounEtCIV
+  </textarea>
+</div>
+
+<!-- RACCOURCIS DE NAVIGATION RAPIDE -->
+<div class="flex gap-3 justify-center mt-6 flex-wrap links-bar">
+  <a href="http://localhost:5000/cockpit" target="_blank" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-bold hover:text-white no-underline">🖥️ Centre 3-en-1 Cockpit</a>
+  <a href="http://localhost:5000/client" target="_blank" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-bold hover:text-white no-underline">🛍️ App Client Particulier</a>
+  <a href="http://localhost:5000/?auto=demo" target="_blank" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-bold hover:text-white no-underline">🚴 App Brobrosseur</a>
+  <a href="http://localhost:5000/admin" target="_blank" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-bold hover:text-white no-underline">👑 Console Fondateurs (70/30)</a>
+</div>
+
+<script>
+  function setMode(mode) {
+    document.body.className = 'mode-' + mode;
+    
+    // Mise à jour de l'état actif des boutons
+    document.querySelectorAll('.studio-btn').forEach(b => b.classList.remove('active'));
+    if (mode === 'tiktok') document.getElementById('btnTikTok').classList.add('active');
+    if (mode === 'facebook') document.getElementById('btnFacebook').classList.add('active');
+    if (mode === 'landscape') document.getElementById('btnLandscape').classList.add('active');
+    if (mode === 'flyer') document.getElementById('btnFlyer').classList.add('active');
+
+    // Affichage ou masquage de l'overlay TikTok
+    const tt = document.getElementById('tiktokOverlay');
+    if (tt) {
+      tt.style.display = (mode === 'tiktok') ? 'flex' : 'none';
+    }
+  }
+
+  function copyCaption() {
+    const txt = document.getElementById('captionContent');
+    txt.select();
+    navigator.clipboard.writeText(txt.value).then(() => {
+      document.getElementById('copyText').textContent = 'Copié !';
+      document.getElementById('copyIcon').textContent = '✅';
+      setTimeout(() => {
+        document.getElementById('copyText').textContent = 'Copier le texte';
+        document.getElementById('copyIcon').textContent = '📋';
+      }, 2500);
+    }).catch(() => {
+      alert('Texte sélectionné, appuyez sur Ctrl+C');
+    });
+  }
+
+  function toastLike() {
+    const lc = document.getElementById('likeCount');
+    lc.textContent = '28.5K';
+    lc.style.color = '#ff4b4b';
+  }
+
+  async function downloadPosterImage() {
+    const el = document.getElementById('posterArea');
+    const tt = document.getElementById('tiktokOverlay');
+    
+    // Si l'utilisateur télécharge, on peut masquer temporairement la fausse sidebar TikTok pour une image pure si besoin
+    try {
+      const canvas = await html2canvas(el, {
+        scale: 2.5, // Très haute résolution pour réseaux sociaux (1080p+)
+        useCORS: true,
+        backgroundColor: '#09150e',
+        logging: false
+      });
+      const link = document.createElement('a');
+      link.download = 'Affiche_Brobroli_' + document.body.className.replace('mode-', '') + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch(err) {
+      alert('Capture automatique impossible sans serveur, vous pouvez utiliser la fonction Impression / Enregistrer en PDF !');
+    }
+  }
+</script>
+
+</body>
+</html>

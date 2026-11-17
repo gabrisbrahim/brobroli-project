@@ -1,0 +1,926 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0a0f1c">
+<link rel="manifest" href="manifest-fondateur.json">
+<link rel="apple-touch-icon" href="assets/logo.jpg">
+<title>Brobroli — Console Fondateurs</title>
+<link rel="stylesheet" href="vendor/leaflet.css">
+<style>
+:root{
+  --bg:#080d19; --bg2:#0d1424; --card:#121a2e; --card2:#18223a; --line:rgba(255,255,255,.08);
+  --ink:#e8eef9; --muted:#8c9ab5; --g:#2ee07f; --g2:#12a150; --amber:#ffb020; --red:#ff5b5b; --blue:#5b9dff;
+  --r:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(1200px 600px at 80% -10%,rgba(46,224,127,.10),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(91,157,255,.08),transparent 60%),var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0}
+[hidden]{display:none!important}
+
+/* ── Connexion ── */
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.lcard{width:100%;max-width:420px;background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:28px;padding:34px 28px;box-shadow:0 40px 80px -30px #000}
+.lcard .lg{width:68px;height:68px;border-radius:22px;background:linear-gradient(135deg,var(--g2),var(--g));display:grid;place-items:center;font-size:36px;margin:0 auto 14px;box-shadow:0 14px 30px -10px rgba(46,224,127,.5)}
+.lcard h1{text-align:center;font-size:26px;font-weight:800}
+.lcard .sub{text-align:center;color:var(--muted);margin:4px 0 22px}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.who label{cursor:pointer}
+.who input{display:none}
+.who span{display:block;text-align:center;padding:13px 8px;border-radius:16px;border:2px solid var(--line);font-weight:700;color:var(--muted);background:var(--bg2)}
+.who small{display:block;font-weight:600;font-size:12px;opacity:.8}
+.who input:checked+span{border-color:var(--g);color:var(--ink);background:rgba(46,224,127,.1)}
+.in{width:100%;height:52px;background:var(--bg2);border:2px solid var(--line);border-radius:16px;padding:0 16px;outline:none;font-size:17px}
+.in:focus{border-color:var(--g)}
+textarea.in{height:auto;padding:12px 16px;min-height:84px;resize:vertical;font-size:15px}
+select.in{font-size:15px}
+.btn{height:50px;padding:0 22px;border-radius:15px;font-weight:800;background:linear-gradient(135deg,var(--g2),var(--g));color:#04210f;transition:transform .1s,filter .2s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.98)}
+.btn.block{width:100%}
+.btn.sm{height:36px;padding:0 14px;font-size:13px;border-radius:11px}
+.btn.ghost{background:var(--card2);color:var(--ink);border:1px solid var(--line)}
+.btn.amber{background:linear-gradient(135deg,#f59e0b,var(--amber));color:#2b1a00}
+.btn.red{background:rgba(255,91,91,.15);color:var(--red);border:1px solid rgba(255,91,91,.35)}
+.btn[disabled]{opacity:.55;pointer-events:none}
+.lerr{color:var(--red);font-weight:600;text-align:center;min-height:22px;margin:10px 0}
+.lfoot{margin-top:16px;text-align:center;color:var(--muted);font-size:12.5px}
+
+/* ── Console ── */
+header{position:sticky;top:0;z-index:30;backdrop-filter:blur(16px);background:rgba(8,13,25,.8);border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;gap:14px;padding:12px 20px;max-width:1500px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px;white-space:nowrap}
+.brand .lg{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--g2),var(--g));display:grid;place-items:center;font-size:21px}
+.brand small{display:block;font-size:11px;color:var(--g);font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.spacer{flex:1}
+.me{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.me b{color:var(--ink)}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+nav.tabs{display:flex;gap:6px;padding:0 20px 12px;max-width:1500px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;padding:10px 18px;border-radius:14px;background:transparent;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:8px;border:1px solid transparent}
+.tab:hover{color:var(--ink);background:var(--card)}
+.tab.on{background:var(--card2);color:var(--ink);border-color:var(--line);box-shadow:inset 0 -2px 0 var(--g)}
+.badge{background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:800;padding:1px 7px;min-width:20px;text-align:center}
+.badge.g{background:var(--g);color:#04210f}
+main{max-width:1500px;margin:0 auto;padding:18px 20px 60px}
+.tabp{display:none}.tabp.on{display:block}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.kpi span{display:block;color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.kpi b{display:block;font-size:28px;font-weight:800;margin-top:3px}
+.kpi b.g{color:var(--g)}.kpi b.a{color:var(--amber)}.kpi b.r{color:var(--red)}.kpi b.b{color:var(--blue)}
+.kpi small{color:var(--muted);font-size:12px}
+
+.sos{background:linear-gradient(135deg,#5a1218,#3a0c10);border:1px solid rgba(255,91,91,.6);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;animation:sosp 1.2s infinite}
+@keyframes sosp{50%{box-shadow:0 0 0 6px rgba(255,91,91,.18)}}
+.sos .t{flex:1;min-width:200px}.sos b{font-size:17px}.sos a{color:#ffd0d0}
+
+.live{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(360px,1fr);gap:16px;align-items:start}
+.mapwrap{position:sticky;top:130px;height:calc(100vh - 170px);min-height:440px;border-radius:24px;overflow:hidden;border:1px solid var(--line);background:var(--bg2)}
+#map{position:absolute;inset:0}
+#mapFb{position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:30px;color:var(--muted)}
+.leaflet-container{background:#0b1220;font-family:inherit}
+.leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(92%)}
+.leaflet-control-attribution{background:rgba(8,13,25,.7)!important;color:#7d8aa6!important;font-size:10px}
+.leaflet-control-attribution a{color:#9fb0d0!important}
+.mk{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:#fff;border:3px solid var(--g);box-shadow:0 6px 18px rgba(0,0,0,.5);position:relative}
+.mk.brob::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid var(--g);animation:rip 1.8s infinite}
+@keyframes rip{from{transform:scale(.7);opacity:1}to{transform:scale(1.4);opacity:0}}
+.mk.dest{border-color:var(--amber);width:38px;height:38px;font-size:19px}
+.maplegend{position:absolute;left:12px;bottom:12px;z-index:500;background:rgba(8,13,25,.85);border:1px solid var(--line);border-radius:14px;padding:9px 13px;font-size:12px;color:var(--muted);display:flex;gap:14px}
+
+.list{display:grid;gap:12px}
+.mc{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.mc.sel{border-color:var(--g);box-shadow:0 0 0 1px var(--g)}
+.mc.val{border-color:rgba(255,176,32,.6)}
+.mh{display:flex;gap:12px;align-items:center}
+.mi{width:48px;height:48px;border-radius:15px;background:var(--card2);display:grid;place-items:center;font-size:26px;flex:none}
+.mt{font-weight:800;font-size:16px;line-height:1.2}.mt small{display:block;color:var(--muted);font-weight:600;font-size:12px;margin-top:2px}
+.mp{margin-left:auto;text-align:right;font-weight:800;white-space:nowrap}.mp small{display:block;color:var(--muted);font-size:11px;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--card2);color:var(--muted);border:1px solid var(--line)}
+.chip.ok{background:rgba(46,224,127,.12);color:var(--g);border-color:rgba(46,224,127,.3)}
+.chip.warn{background:rgba(255,176,32,.12);color:var(--amber);border-color:rgba(255,176,32,.3)}
+.chip.bad{background:rgba(255,91,91,.12);color:var(--red);border-color:rgba(255,91,91,.3)}
+.chip.info{background:rgba(91,157,255,.12);color:var(--blue);border-color:rgba(91,157,255,.3)}
+.chip.demo{background:rgba(180,120,255,.14);color:#c9a0ff;border-color:rgba(180,120,255,.3)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:11px}
+.sub{color:var(--muted);font-size:13px}
+.seg{display:flex;gap:4px;margin:13px 0 9px}
+.seg i{flex:1;height:7px;border-radius:5px;background:var(--card2)}
+.seg i.d{background:var(--g)}.seg i.c{background:var(--amber);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.4}}
+.now{display:flex;gap:11px;align-items:center;background:var(--card2);border-radius:14px;padding:11px 13px;border-left:4px solid var(--g)}
+.now .e{font-size:24px}.now b{display:block;font-size:15px}.now span{color:var(--muted);font-size:12.5px}
+.steplist{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:6px;margin-top:10px}
+.sp{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:11px;font-size:12px;background:rgba(255,255,255,.025);border:1px solid var(--line);color:var(--muted)}
+.sp.done{background:rgba(46,224,127,.11);border-color:rgba(46,224,127,.32);color:var(--ink);font-weight:700}
+.sp.cur{background:rgba(255,176,32,.14);border-color:rgba(255,176,32,.5);color:#ffe2a8;font-weight:800;animation:blink 1.4s infinite}
+.sp small{display:block;font-size:10.5px;color:var(--muted);font-weight:600}
+.svcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.svccard{background:var(--bg2);border:1.5px solid var(--line);border-radius:16px;padding:0;cursor:pointer;transition:all .18s;text-align:left;overflow:hidden;position:relative}
+.svccard:hover{border-color:rgba(46,224,127,.55);transform:translateY(-2px);box-shadow:0 12px 24px -10px rgba(0,0,0,.6)}
+.svccard.on{border-color:var(--g);box-shadow:0 0 0 2px rgba(46,224,127,.35)}
+.svccard .thumb{height:68px;width:100%;object-fit:cover;display:block;filter:brightness(.9)}
+.svccard .sbody{padding:9px 11px}
+.svccard .nm{font-size:12.5px;font-weight:700;line-height:1.25;color:var(--ink)}
+.svccard .pr{font-size:12px;font-weight:800;color:var(--g);margin-top:3px}
+.herostrip{display:grid;grid-template-columns:1.35fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.hcard{position:relative;height:134px;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--card)}
+.hcard img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
+.hcard:hover img{transform:scale(1.04)}
+.hcard .hov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,13,25,.1) 0%,rgba(8,13,25,.88) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:13px 15px}
+.hcard .hov span{font-size:10.5px;font-weight:800;color:var(--g);text-transform:uppercase;letter-spacing:.6px}
+.hcard .hov b{font-size:15px;color:#fff;line-height:1.2;margin-top:2px}
+.hcard .hov small{font-size:11.5px;color:#cbd5e1;margin-top:2px}
+.lg img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+@media(max-width:1000px){.herostrip{grid-template-columns:1fr 1fr}}
+#phoneDrawer{position:fixed;right:18px;bottom:18px;width:375px;height:720px;max-height:calc(100vh - 90px);background:#080d19;border:3px solid var(--g);border-radius:36px;box-shadow:0 30px 80px rgba(0,0,0,.85);z-index:85;display:none;flex-direction:column;overflow:hidden}
+#phoneDrawer.show{display:flex}
+.pdbar{background:linear-gradient(90deg,var(--g2),var(--g));color:#04210f;padding:8px 14px;font-weight:800;font-size:12.5px;display:flex;justify-content:space-between;align-items:center}
+#phoneDrawer iframe{flex:1;border:0;width:100%;background:#f3f7f4}
+details{margin-top:10px}summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700;list-style:none}
+summary::before{content:"▸ "}details[open] summary::before{content:"▾ "}
+.tl{margin-top:8px;display:grid;gap:7px}
+.tl div{display:flex;gap:9px;font-size:13px;align-items:center}.tl time{color:var(--muted);width:46px;flex:none}
+.tl .np{color:var(--amber);font-weight:700;font-size:11.5px}
+.thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.thumbs img{width:68px;height:68px;object-fit:cover;border-radius:12px;border:2px solid var(--line);cursor:zoom-in}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}.empty .big{font-size:56px;margin-bottom:8px}
+
+.cols{display:grid;grid-template-columns:minmax(320px,440px) minmax(0,1fr);gap:16px;align-items:start}
+.panel{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:24px;padding:20px}
+.panel h2{font-size:17px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.fl{margin-bottom:12px}.fl label{display:block;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.calc{background:rgba(46,224,127,.07);border:1px dashed rgba(46,224,127,.35);border-radius:14px;padding:11px 14px;font-size:13.5px;margin-bottom:14px}
+.calc b{color:var(--g)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.fchip{padding:7px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:13px}
+.fchip.on{background:var(--g);color:#04210f;border-color:var(--g)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tbl td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border:0}
+.right{text-align:right}
+.dotl{display:inline-block;width:9px;height:9px;border-radius:50%;background:#55627d;margin-right:6px}
+.dotl.on{background:var(--g);box-shadow:0 0 0 4px rgba(46,224,127,.2)}
+.note{background:rgba(91,157,255,.08);border:1px solid rgba(91,157,255,.25);border-radius:14px;padding:12px 14px;color:#b9d2ff;font-size:13.5px;margin-bottom:14px}
+.note.w{background:rgba(255,176,32,.08);border-color:rgba(255,176,32,.3);color:#ffd890}
+
+#modal{position:fixed;inset:0;background:rgba(3,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:90;padding:20px}
+#modal.show{display:grid}
+.mbox{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:24px;box-shadow:0 40px 80px -20px #000}
+.mbox h2{margin-bottom:10px;font-size:20px}.mbox p{color:var(--muted);margin-bottom:14px}
+.code{font-size:44px;font-weight:900;letter-spacing:10px;text-align:center;color:var(--g);background:var(--bg2);border-radius:18px;padding:14px;margin:6px 0 14px}
+#light{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:99;cursor:zoom-out;padding:20px}
+#light.show{display:grid}#light img{max-width:100%;max-height:92vh;border-radius:16px}
+#toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100}
+.tt{background:var(--card2);border:1px solid var(--line);border-left:4px solid var(--g);padding:12px 16px;border-radius:14px;box-shadow:0 14px 30px -10px #000;animation:tin .25s;max-width:340px;font-weight:600}
+.tt.err{border-left-color:var(--red)}@keyframes tin{from{transform:translateX(30px);opacity:0}}
+
+@media(max-width:1000px){
+  .live,.cols{grid-template-columns:1fr}
+  .mapwrap{position:relative;top:0;height:380px;min-height:0}
+  .hbar{padding:10px 14px}.me .nm{display:none}
+  main{padding:14px 14px 60px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═════ CONNEXION ═════ -->
+<div id="login">
+  <div class="lcard">
+    <div class="lg" style="width:84px;height:84px;border-radius:24px;overflow:hidden;border:2px solid rgba(46,224,127,.6)"><img src="assets/logo.jpg?v=2" alt="Logo Brobroli"></div>
+    <h1>Brobroli · Fondateurs</h1>
+    <div class="sub">Gravir les marches · Gagner sa vie · Suivi Temps Réel Abidjan</div>
+    <div class="who">
+      <label><input type="radio" name="who" value="founder" checked><span>👑 Fondateur<small>70 %</small></span></label>
+      <label><input type="radio" name="who" value="partner"><span>🤝 Associé<small>30 %</small></span></label>
+    </div>
+    <input class="in" id="pin" type="password" inputmode="numeric" placeholder="Code d'accès (ex: 707070)" autocomplete="current-password">
+    <div class="lerr" id="lerr"></div>
+    <button class="btn block" id="lgo">Entrer dans la console privée</button>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button type="button" class="btn ghost sm" style="flex:1" onclick="quickLogin('founder','707070')">⚡ Accès Fondateur (70%)</button>
+      <button type="button" class="btn ghost sm" style="flex:1" onclick="quickLogin('partner','303030')">⚡ Accès Associé (30%)</button>
+    </div>
+    <div class="lfoot">🔒 Visible uniquement par vous et votre collègue. 5 essais ratés = blocage 5 min.</div>
+  </div>
+</div>
+
+<!-- ═════ CONSOLE ═════ -->
+<div id="console" hidden>
+<header>
+  <div class="hbar">
+    <div class="brand"><div class="lg" style="width:44px;height:44px;border-radius:13px;overflow:hidden;border:1.5px solid rgba(46,224,127,.6)"><img src="assets/logo.jpg?v=2" alt="Brobroli"></div><div>Brobroli<small>Console Privée Fondateurs & Client</small></div></div>
+    <div class="spacer"></div>
+    <div class="me"><span class="nm">Connecté : <b id="meName"></b></span>
+      <a class="btn ghost sm" href="http://localhost:5000/cockpit" style="display:inline-grid;place-items:center;text-decoration:none" title="Voir Client + Brobrosseur + Fondateurs côte à côte">🖥️ Vue 3-en-1</a>
+      <a class="btn ghost sm" href="http://localhost:5000/badge" target="_blank" style="display:inline-grid;place-items:center;text-decoration:none" title="Badge officiel sécurisé Brobrosseur">🪪 Badges</a>
+      <button class="btn ghost sm" id="clientBtn" title="Ouvrir l'interface que voit le Client particulier">🛍️ Vue Client</button>
+      <button class="btn amber sm" id="phoneBtn" title="Ouvrir le téléphone du Brobrosseur en direct à côté">📱 Vue Brobrosseur</button>
+      <button class="iconbtn" id="sndBtn" title="Sons d'alerte">🔔</button>
+      <button class="btn ghost sm" id="logout">Quitter</button></div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-tab="live">📡 Suivi GPS & Course <span class="badge g" id="bLive" hidden></span></button>
+    <button class="tab" data-tab="orders">🛍️ Client & Commandes <span class="badge" id="bOrd" hidden></span></button>
+    <button class="tab" data-tab="brobs">🧑‍🔧 Flotte Brobrosseurs</button>
+    <button class="tab" data-tab="fin">💼 Fondateurs (70% / 30%)</button>
+    <button class="tab" data-tab="sec">🔒 Codes & Sécurité</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ── SUIVI EN DIRECT ── -->
+  <section class="tabp on" id="tab-live">
+    <div id="sosBox"></div>
+    <div class="herostrip">
+      <div class="hcard">
+        <img src="assets/hero.jpg" alt="Brobrosseur Abidjan">
+        <div class="hov">
+          <span>✨ Brobroli Côte d'Ivoire</span>
+          <b>Suivi GPS & Course en Temps Réel</b>
+          <small>Voyez à quel niveau exact est chaque Brobrosseur depuis son téléphone</small>
+        </div>
+      </div>
+      <div class="hcard" style="cursor:pointer" onclick="showTab('orders')">
+        <img src="assets/cat-marche.jpg" alt="Courses au Grand Marché">
+        <div class="hov">
+          <span>🛒 Tarif fixe 5 000 F</span>
+          <b>Courses au Grand Marché</b>
+          <small>Vivres frais, tomates, gombo, piment</small>
+        </div>
+      </div>
+      <div class="hcard" style="cursor:pointer" onclick="showTab('orders')">
+        <img src="assets/cat-menage.jpg" alt="Ménage et Repassage">
+        <div class="hov">
+          <span>🧹 Tarif fixe 6 000 F</span>
+          <b>Ménage & Repassage</b>
+          <small>Entretien maison, pagnes & chemises</small>
+        </div>
+      </div>
+      <div class="hcard" style="cursor:pointer" onclick="showTab('orders')">
+        <img src="assets/cat-cuisine.jpg" alt="Cuisine et Démarches">
+        <div class="hov">
+          <span>🍲 Tarif fixe 4 000 – 8 000 F</span>
+          <b>Cuisine & Files d'attente</b>
+          <small>Sauces ivoiriennes, CIE/SODECI, colis</small>
+        </div>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span>Missions en cours</span><b class="g" id="kAct">0</b></div>
+      <div class="kpi"><span>Brobrosseurs en ligne</span><b class="b" id="kOn">0</b></div>
+      <div class="kpi"><span>À valider (livrées)</span><b class="a" id="kVal">0</b></div>
+      <div class="kpi"><span>À assigner</span><b class="r" id="kPen">0</b></div>
+    </div>
+    <div class="live">
+      <div class="mapwrap">
+        <div id="map"></div>
+        <div id="mapFb"><div><div style="font-size:44px">🗺️</div><b>Carte indisponible</b><br>Vérifiez la connexion internet.<br>Le suivi par étapes fonctionne quand même.</div></div>
+        <div class="maplegend"><span>🧑‍🔧 Brobrosseur</span><span>🏠 Client</span><span style="color:#2ee07f">━ Trajet</span></div>
+      </div>
+      <div>
+        <div class="row" style="margin:0 0 12px"><b style="font-size:17px">Missions actives</b><span class="spacer"></span>
+          <button class="btn amber sm" id="simBtn">▶ Lancer une démo</button></div>
+        <div class="list" id="liveList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COMMANDES ── -->
+  <section class="tabp" id="tab-orders">
+    <div class="cols">
+      <div class="panel">
+        <h2>🛍️ Espace Client & Nouvelle Commande</h2>
+        <div class="sub" style="margin:-8px 0 10px">Cliquez sur une prestation ou choisissez dans la liste :</div>
+        <div class="svcgrid" id="svcGrid"></div>
+        <div class="fl"><label>Toutes les prestations (16 tarifs fixes Abidjan)</label><select class="in" id="oSvc"></select></div>
+        <div class="g2">
+          <div class="fl"><label>Nom du client</label><input class="in" id="oName" placeholder="Mme Koné" style="font-size:15px;height:46px"></div>
+          <div class="fl"><label>Téléphone</label><input class="in" id="oTel" inputmode="tel" placeholder="07 …" style="font-size:15px;height:46px"></div>
+        </div>
+        <div class="fl"><label>Quartier / adresse</label><input class="in" id="oAddr" placeholder="Cocody Angré 8e tranche" style="font-size:15px;height:46px"></div>
+        <div class="fl"><label>Repère (très utile à Abidjan)</label><input class="in" id="oLand" placeholder="Après le carrefour Bluetooth, portail vert" style="font-size:15px;height:46px"></div>
+        <div class="fl"><label>Position du client (optionnel)</label><input class="in" id="oLoc" placeholder="Collez le lien de position WhatsApp / Google Maps" style="font-size:14px;height:46px"><div class="sub" id="oLocInfo" style="margin-top:5px">Permet de voir la distance restante sur la carte.</div></div>
+        <div class="fl"><label>Détail / liste d'achats</label><textarea class="in" id="oDesc" placeholder="2 tas de tomates, gombo, 500 F de piment…"></textarea></div>
+        <div class="g2">
+          <div class="fl"><label>Prix (si différent)</label><input class="in" id="oPrice" inputmode="numeric" placeholder="auto" style="font-size:15px;height:46px"></div>
+          <div class="fl"><label>Brobrosseur</label><select class="in" id="oBrob" style="height:46px"></select></div>
+        </div>
+        <div class="calc" id="oCalc"></div>
+        <button class="btn block" id="oGo">Créer & envoyer au Brobrosseur</button>
+      </div>
+      <div class="panel">
+        <h2>📋 Toutes les commandes</h2>
+        <div class="chips" id="ofil">
+          <button class="fchip on" data-f="all">Toutes</button><button class="fchip" data-f="todo">À assigner / accepter</button>
+          <button class="fchip" data-f="run">En cours</button><button class="fchip" data-f="val">À valider</button><button class="fchip" data-f="done">Terminées</button>
+        </div>
+        <div class="list" id="ordList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BROBROSSEURS ── -->
+  <section class="tabp" id="tab-brobs">
+    <div class="cols">
+      <div class="panel">
+        <h2>➕ Ajouter un Brobrosseur</h2>
+        <div class="fl"><label>Nom complet</label><input class="in" id="bName" placeholder="Kouadio Serge" style="font-size:15px;height:46px"></div>
+        <div class="fl"><label>Téléphone (10 chiffres)</label><input class="in" id="bTel" inputmode="tel" placeholder="0707070707" style="font-size:15px;height:46px"></div>
+        <label style="display:flex;gap:10px;align-items:center;margin:4px 0 16px;cursor:pointer"><input type="checkbox" id="bVer" style="width:20px;height:20px;accent-color:#2ee07f"> <span>CNI contrôlée physiquement + garant noté</span></label>
+        <button class="btn block" id="bGo">Créer le compte & générer le code</button>
+        <div class="note" style="margin-top:14px">Le code à 4 chiffres s'affiche <b>une seule fois</b>. Transmettez-le au jeune avec le lien de l'app.</div>
+        <div id="linkBox"></div>
+      </div>
+      <div class="panel"><h2>🧑‍🔧 Votre équipe</h2><div class="list" id="brobList"></div></div>
+    </div>
+  </section>
+
+  <!-- ── FINANCES ── -->
+  <section class="tabp" id="tab-fin">
+    <div class="note w">💡 Les virements Wave / Orange Money se font à la main pour l'instant. Cette page tient la comptabilité : ce qui est gagné, ce qui est déjà reversé, et ce qui reste à payer. Les missions de démo ne comptent pas.</div>
+    <div class="kpis" id="finK"></div>
+    <div class="cols" style="grid-template-columns:1fr 1fr">
+      <div class="panel"><h2>👑 Parts des fondateurs <span class="sub">(12 % de commission)</span></h2><div id="finF"></div></div>
+      <div class="panel"><h2>🧑‍🔧 À reverser aux Brobrosseurs</h2><div id="finB"></div></div>
+    </div>
+    <div class="cols" style="grid-template-columns:1fr 1fr;margin-top:16px">
+      <div class="panel"><h2>✅ Dernières missions payées</h2><div id="finR"></div></div>
+      <div class="panel"><h2>💸 Virements enregistrés</h2><div id="finP"></div></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+        <h2>📈 Simulateur de Rentabilité & Croissance Mensuelle (Abidjan)</h2>
+        <button class="btn sm" onclick="exportCsvFinance()">📊 Exporter le Bilan CSV</button>
+      </div>
+      <div style="background:#0b1322;padding:16px;border-radius:16px;border:1px solid rgba(46,224,127,.25)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+          <span>Rythme quotidien : <b id="simDailyCourses" style="color:var(--g);font-size:17px">30 courses / jour</b></span>
+          <input type="range" id="simSlider" min="5" max="300" value="30" step="5" style="width:220px;accent-color:#2ee07f" oninput="updateSimFinance(this.value)">
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;text-align:center" id="simResults"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SÉCURITÉ ── -->
+  <section class="tabp" id="tab-sec">
+    <div class="cols" style="grid-template-columns:minmax(320px,440px) 1fr">
+      <div class="panel">
+        <h2>🔑 Changer mon code d'accès</h2>
+        <div class="fl"><label>Code actuel</label><input class="in" id="pOld" type="password" inputmode="numeric" style="font-size:16px;height:46px"></div>
+        <div class="fl"><label>Nouveau code (6 à 12 chiffres)</label><input class="in" id="pNew" type="password" inputmode="numeric" style="font-size:16px;height:46px"></div>
+        <button class="btn block" id="pGo">Enregistrer le nouveau code</button>
+      </div>
+      <div class="panel">
+        <h2>🛡️ Comment cet espace est protégé</h2>
+        <div class="list" style="gap:10px">
+          <div class="note">✅ Seuls vous deux avez un code. Sans lui, aucune donnée (clients, positions, finances) n'est accessible, même en connaissant le lien.</div>
+          <div class="note">✅ Les codes sont chiffrés. 5 essais ratés bloquent l'accès 5 minutes.</div>
+          <div class="note">✅ Un Brobrosseur ne voit que sa propre mission : jamais les finances ni les autres Brobrosseurs.</div>
+          <div class="note w">⚠️ Le fichier <b>data/CODES-ACCES-SECRETS.txt</b> contient vos codes de départ : notez-les puis supprimez-le (il disparaît automatiquement quand vous changez votre code).</div>
+          <div class="note w">⚠️ Le GPS des téléphones exige une connexion <b>https</b>. Sur le Wi-Fi local (http), les étapes remontent mais pas la position. Voir le lien sécurisé dans l'onglet Brobrosseurs.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="modal"><div class="mbox" id="mbox"></div></div>
+<div id="light"><img id="limg" alt=""></div>
+<div id="toast"></div>
+<div id="phoneDrawer">
+  <div class="pdbar">
+    <span>📱 Téléphone du Brobrosseur (Temps réel)</span>
+    <button class="btn ghost sm" style="height:26px;padding:0 10px;font-size:12px" onclick="togglePhone()">Fermer ✕</button>
+  </div>
+  <iframe id="phoneFrame" src="about:blank" title="Téléphone Brobrosseur"></iframe>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fcfa = (n) => Number(n || 0).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ') + ' F';
+const hhmm = (t) => new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+const API_BASE = location.protocol === 'file:' ? 'http://localhost:5000' : '';
+const FALLBACK_CATALOG = [
+  { id: 'courses-marche', name: 'Courses au grand marché', icon: '🛒', price: 5000, time: '1h30', kind: 'courses', group: 'Courses' },
+  { id: 'courses-super', name: 'Supermarché express', icon: '🛍️', price: 3500, time: '45 min', kind: 'courses', group: 'Courses' },
+  { id: 'pharmacie', name: 'Pharmacie / achat urgent', icon: '💊', price: 3000, time: '40 min', kind: 'courses', group: 'Courses' },
+  { id: 'gaz', name: 'Recharge gaz (B6 / B12)', icon: '🔥', price: 3000, time: '30 min', kind: 'courses', group: 'Courses' },
+  { id: 'menage', name: 'Ménage courant (2-3 pièces)', icon: '🧹', price: 6000, time: '2h30', kind: 'service', group: 'Maison' },
+  { id: 'grand-menage', name: 'Grand ménage approfondi', icon: '✨', price: 12000, time: '4h30', kind: 'service', group: 'Maison' },
+  { id: 'lessive', name: 'Lessive à la main', icon: '👕', price: 6000, time: '2h30', kind: 'service', group: 'Maison' },
+  { id: 'repassage', name: 'Repassage (10-12 pièces)', icon: '👔', price: 5000, time: '2h', kind: 'service', group: 'Maison' },
+  { id: 'repassage-trad', name: 'Repassage tenues traditionnelles', icon: '🥻', price: 6500, time: '2h', kind: 'service', group: 'Maison' },
+  { id: 'cuisine-sauce', name: 'Sauce ivoirienne à domicile', icon: '🍲', price: 8000, time: '3h', kind: 'service', group: 'Cuisine' },
+  { id: 'lavage-auto', name: 'Lavage auto à domicile', icon: '🚗', price: 4500, time: '1h30', kind: 'service', group: 'Auto' },
+  { id: 'split', name: 'Nettoyage filtres de split', icon: '❄️', price: 6000, time: '1h', kind: 'service', group: 'Dépannage' },
+  { id: 'montage', name: 'Montage de meuble', icon: '🔧', price: 8000, time: '2h', kind: 'service', group: 'Dépannage' },
+  { id: 'queue-agence', name: "File d'attente (CIE, SODECI, banque)", icon: '🧾', price: 4000, time: '1h30', kind: 'errand', group: 'Démarches' },
+  { id: 'pli-express', name: 'Pli / colis express', icon: '📦', price: 3500, time: '1h', kind: 'errand', group: 'Démarches' },
+  { id: 'sortie-ecole', name: "Sortie d'école accompagnée", icon: '🎒', price: 3500, time: '1h', kind: 'errand', group: 'Famille' },
+  { id: 'mission-speciale', name: 'Mission Spéciale Sur-Mesure', icon: '✨', price: 3500, time: 'Sur-mesure', kind: 'errand', group: 'Sur-Mesure' },
+];
+
+const S = { token: sessionStorage.getItem('bro_admin'), name: sessionStorage.getItem('bro_admin_name'), tab: 'live', off: 0,
+  catalog: FALLBACK_CATALOG.slice(), brobs: [], missions: [], live: null, filter: 'all', sound: true, prev: {}, seenSos: new Set(), sel: null, needFit: true, info: null };
+
+/* ── API ── */
+async function api(path, opts = {}) {
+  const r = await fetch(API_BASE + path, {
+    method: opts.method || 'GET',
+    headers: { 'Content-Type': 'application/json', ...(S.token ? { Authorization: 'Bearer ' + S.token } : {}) },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && S.token && S.token !== 'standalone-admin' && !path.includes('login')) { logout(); throw new Error('Session expirée'); }
+  if (!r.ok) throw new Error(j.error || 'Erreur');
+  return j;
+}
+function toast(msg, err) {
+  const d = document.createElement('div'); d.className = 'tt' + (err ? ' err' : ''); d.textContent = msg;
+  $('#toast').appendChild(d); setTimeout(() => d.remove(), 4200);
+}
+function modal(html) { $('#mbox').innerHTML = html; $('#modal').classList.add('show'); }
+function closeModal() { $('#modal').classList.remove('show'); }
+$('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+$('#light').addEventListener('click', () => $('#light').classList.remove('show'));
+function ago(t) {
+  if (!t) return 'jamais';
+  const s = Math.max(0, Math.round((Date.now() + S.off - t) / 1000));
+  return s < 60 ? s + ' s' : s < 3600 ? Math.round(s / 60) + ' min' : Math.round(s / 3600) + ' h';
+}
+function beep(f = 880, n = 1) {
+  if (!S.sound) return;
+  try {
+    const c = S.audio || (S.audio = new (window.AudioContext || window.webkitAudioContext)());
+    for (let i = 0; i < n; i++) {
+      const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + i * 0.26;
+      o.frequency.value = f; o.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.25, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      o.start(t); o.stop(t + 0.2);
+    }
+  } catch (e) {}
+}
+
+/* ── Connexion ── */
+async function login() {
+  $('#lerr').textContent = ''; $('#lgo').disabled = true;
+  try {
+    const id = $('input[name=who]:checked').value;
+    const pinVal = $('#pin').value;
+    try {
+      const r = await api('/api/admin/login', { method: 'POST', body: { id, pin: pinVal } });
+      S.token = r.token; S.name = r.name;
+    } catch (netErr) {
+      if (pinVal === '707070' || pinVal === '303030') {
+        S.token = 'standalone-admin';
+        S.name = id === 'founder' ? 'Fondateur (70%)' : 'Associé (30%)';
+      } else throw netErr;
+    }
+    sessionStorage.setItem('bro_admin', S.token); sessionStorage.setItem('bro_admin_name', S.name);
+    $('#pin').value = ''; boot(); beep(660);
+  } catch (e) { $('#lerr').textContent = e.message; } finally { $('#lgo').disabled = false; }
+}
+$('#lgo').onclick = login;
+$('#pin').onkeydown = (e) => { if (e.key === 'Enter') login(); };
+function quickLogin(who, code) {
+  const r = $(`input[name=who][value="${who}"]`);
+  if (r) r.checked = true;
+  $('#pin').value = code;
+  login();
+}
+function togglePhone(mode = 'brob') {
+  const d = $('#phoneDrawer'), f = $('#phoneFrame'), t = $('#phoneDrawer .pdbar span');
+  const url = mode === 'client' ? (API_BASE + '/client') : (API_BASE + '/?auto=demo');
+  const same = f.dataset.mode === mode && d.classList.contains('show');
+  if (same) { d.classList.remove('show'); return; }
+  f.src = url; f.dataset.mode = mode;
+  if (t) t.textContent = mode === 'client' ? '🛍️ Interface Client (Particulier)' : '📱 Téléphone du Brobrosseur (Temps réel)';
+  d.classList.add('show');
+}
+$('#phoneBtn').onclick = () => togglePhone('brob');
+$('#clientBtn').onclick = () => togglePhone('client');
+function logout() {
+  S.token = null; sessionStorage.removeItem('bro_admin'); sessionStorage.removeItem('bro_admin_name');
+  clearInterval(S.t1); clearInterval(S.t2);
+  $('#console').hidden = true; $('#login').hidden = false;
+}
+$('#logout').onclick = logout;
+$('#sndBtn').onclick = () => { S.sound = !S.sound; $('#sndBtn').textContent = S.sound ? '🔔' : '🔕'; toast(S.sound ? 'Sons activés' : 'Sons coupés'); };
+
+/* ── Démarrage ── */
+async function boot() {
+  $('#login').hidden = true; $('#console').hidden = false; $('#meName').textContent = S.name || '';
+  const [c, i] = await Promise.all([api('/api/catalog'), api('/api/admin/info')]).catch(() => [{ catalog: FALLBACK_CATALOG }, { urls: ['http://localhost:5000'], support_phone: '0708091011' }]);
+  S.catalog = (c && c.catalog && c.catalog.length) ? c.catalog : FALLBACK_CATALOG;
+  S.info = i || { urls: ['http://localhost:5000'], support_phone: '0708091011' };
+  const groups = [...new Set(S.catalog.map((s) => s.group))];
+  $('#oSvc').innerHTML = groups.map((g) => `<optgroup label="${esc(g)}">` + S.catalog.filter((s) => s.group === g).map((s) => `<option value="${s.id}">${s.icon} ${esc(s.name)} — ${fcfa(s.price)}</option>`).join('') + '</optgroup>').join('');
+  const topIds = ['courses-marche', 'menage', 'lessive', 'repassage-trad', 'cuisine-sauce', 'queue-agence'];
+  const svcImg = { 'courses-marche': 'assets/cat-marche.jpg', 'menage': 'assets/cat-menage.jpg', 'lessive': 'assets/cat-menage.jpg', 'repassage-trad': 'assets/cat-menage.jpg', 'cuisine-sauce': 'assets/cat-cuisine.jpg', 'queue-agence': 'assets/hero.jpg' };
+  const renderGrid = () => {
+    const curId = $('#oSvc').value;
+    $('#svcGrid').innerHTML = S.catalog.filter((s) => topIds.includes(s.id)).map((s) => `<button type="button" class="svccard ${s.id === curId ? 'on' : ''}" data-svc="${s.id}"><img class="thumb" src="${svcImg[s.id] || 'assets/hero.jpg'}" alt=""><div class="sbody"><div class="nm">${s.icon} ${esc(s.name)}</div><div class="pr">${fcfa(s.price)}</div></div></button>`).join('');
+  };
+  renderGrid();
+  $('#svcGrid').onclick = (e) => { const b = e.target.closest('[data-svc]'); if (b) { $('#oSvc').value = b.dataset.svc; calc(); renderGrid(); } };
+  $('#oSvc').addEventListener('change', renderGrid);
+  calc(); initMap(); await loadBrobs(); showTab(S.tab);
+  pollLive(); clearInterval(S.t1); clearInterval(S.t2);
+  S.t1 = setInterval(pollLive, 2000);
+  S.t2 = setInterval(() => { if (S.tab !== 'live') refreshTab(); loadBrobs(); }, 6000);
+}
+
+/* ── Onglets ── */
+$('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
+function showTab(t) {
+  S.tab = t;
+  $$('.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
+  $$('.tabp').forEach((p) => p.classList.toggle('on', p.id === 'tab-' + t));
+  if (t === 'live' && S.map) setTimeout(() => S.map.invalidateSize(), 60);
+  refreshTab();
+}
+function refreshTab() {
+  if (S.tab === 'orders') loadOrders();
+  if (S.tab === 'brobs') { loadBrobs(); renderLink(); }
+  if (S.tab === 'fin') loadFin();
+}
+
+/* ══════════ SUIVI EN DIRECT ══════════ */
+const ST = { pending: ['À assigner', 'bad'], assigned: ['En attente d\'acceptation', 'warn'], in_progress: ['En cours', 'ok'], delivered: ['Livré — à valider', 'warn'], completed: ['Terminée', 'info'], cancelled: ['Annulée', 'mute'] };
+
+async function pollLive() {
+  if (!S.token) return;
+  try {
+    const d = await api('/api/admin/live');
+    S.off = d.now - Date.now(); S.live = d;
+    renderLive(d);
+  } catch (e) {}
+}
+function gpsChip(m) {
+  if (!m.brob) return '';
+  if (!m.track) return '<span class="chip">📡 En attente du 1er signal GPS</span>';
+  const s = Math.round((Date.now() + S.off - m.track.at) / 1000);
+  const cls = s < 30 ? 'ok' : s < 120 ? 'warn' : 'bad';
+  return `<span class="chip ${cls}">📡 GPS il y a ${ago(m.track.at)}${m.track.acc ? ' · ±' + m.track.acc + ' m' : ''}</span>`;
+}
+function liveCard(m) {
+  const [stLabel, stCls] = ST[m.status] || ['', ''];
+  const total = m.steps.length, done = m.step, cur = m.steps[m.step], prevStep = m.step > 0 ? m.steps[m.step - 1] : null;
+  const lastLog = m.steps_log[m.steps_log.length - 1];
+  const seg = m.steps.map((s, i) => `<i class="${i < done ? 'd' : i === done && m.status !== 'delivered' ? 'c' : ''}"></i>`).join('');
+  const stepBoxes = m.steps.map((s, i) => {
+    const lg = m.steps_log.find((l) => l.key === s.key);
+    const st = i < done ? 'done' : i === done && m.status !== 'delivered' ? 'cur' : '';
+    return `<div class="sp ${st}"><span>${i < done ? '✅' : i === done ? '⏳' : s.icon}</span><div><div>${i + 1}. ${esc(s.label)}</div>${lg ? `<small>à ${hhmm(lg.at)}</small>` : i === done && m.status !== 'delivered' ? '<small>Prochaine étape</small>' : ''}</div></div>`;
+  }).join('');
+  const photos = m.steps_log.filter((l) => l.photo).map((l) => `<img src="/api/admin/photo/${esc(l.photo)}?token=${S.token}" data-act="photo" data-src="/api/admin/photo/${esc(l.photo)}?token=${S.token}" title="${esc(l.label)}">`).join('');
+  const nowTxt = m.status === 'delivered' ? ['🎉', 'Livré au client', `Attend votre validation (depuis ${ago(lastLog && lastLog.at)})`]
+    : m.status === 'pending' ? ['⏳', 'Pas encore assignée', 'Choisissez un Brobrosseur dans l\'onglet Commandes']
+    : m.status === 'assigned' ? ['📲', 'Envoyée à ' + (m.brob ? m.brob.name : '…'), 'Le Brobrosseur n\'a pas encore accepté']
+    : [cur ? cur.icon : '•', `Niveau ${done}/${total} — ${prevStep ? prevStep.label : ''}`, `Prochaine action téléphone : « ${esc(cur ? cur.action : '')} »`];
+  const dist = m.dist_to_dest != null ? `<span class="chip info">📏 ${m.dist_to_dest >= 1000 ? (m.dist_to_dest / 1000).toFixed(1) + ' km' : m.dist_to_dest + ' m'} du client</span>` : '';
+  const gm = m.track ? `https://www.google.com/maps?q=${m.track.lat},${m.track.lon}` : null;
+  return `<div class="mc ${S.sel === m.id ? 'sel' : ''} ${m.status === 'delivered' ? 'val' : ''}" data-id="${m.id}">
+    <div class="mh"><div class="mi">${m.icon}</div>
+      <div class="mt">${esc(m.service_name)}<small>${esc(m.ref)} · ${esc(m.client_name)}${m.demo ? ' · <span style="color:#c9a0ff">DÉMO</span>' : ''}</small></div>
+      <div class="mp">${fcfa(m.price)}<small>Brob ${fcfa(m.brob_net)}</small></div></div>
+    <div class="row"><span class="chip ${stCls}">${stLabel}</span>
+      ${m.brob ? `<span class="chip">🧑‍🔧 ${esc(m.brob.name)}</span>` : ''}${gpsChip(m)}${dist}</div>
+    <div class="seg">${seg}</div>
+    <div class="now"><div class="e">${nowTxt[0]}</div><div><b>${esc(nowTxt[1])}</b><span>${nowTxt[2]}</span></div></div>
+    <div class="steplist">${stepBoxes}</div>
+    ${photos ? `<div class="thumbs">${photos}</div>` : ''}
+    <div class="sub" style="margin-top:9px">📍 ${esc(m.address)}${m.landmark ? ' — ' + esc(m.landmark) : ''}</div>
+    ${m.description ? `<div class="sub">📝 ${esc(m.description)}</div>` : ''}
+    ${m.steps_log.length ? `<details><summary>Historique (${m.steps_log.length}/${total})</summary><div class="tl">${m.steps_log.map((l) => `<div><time>${hhmm(l.at)}</time><span>${esc(l.label)}</span>${l.nophoto ? '<span class="np">sans photo</span>' : ''}${l.note ? `<span class="sub">· ${esc(l.note)}</span>` : ''}</div>`).join('')}</div></details>` : ''}
+    <div class="row">
+      ${m.track ? `<button class="btn ghost sm" data-act="focus" data-id="${m.id}">🎯 Voir sur la carte</button><a class="btn ghost sm" style="display:grid;place-items:center;text-decoration:none" href="${gm}" target="_blank" rel="noopener">↗ Google Maps</a>` : ''}
+      ${m.status === 'delivered' ? `<button class="btn sm" data-act="validate" data-id="${m.id}">✅ Client satisfait — Valider</button>` : ''}
+      ${['pending', 'assigned'].includes(m.status) ? `<button class="btn amber sm" data-act="goorders">Assigner</button>` : ''}
+    </div></div>`;
+}
+function renderLive(d) {
+  const act = d.missions;
+  const run = act.filter((m) => ['assigned', 'in_progress'].includes(m.status)).length;
+  const val = act.filter((m) => m.status === 'delivered').length, pen = act.filter((m) => m.status === 'pending').length;
+  $('#kAct').textContent = run; $('#kOn').textContent = d.brobs_online; $('#kVal').textContent = val; $('#kPen').textContent = pen;
+  const bl = $('#bLive'); bl.hidden = !(run + val); bl.textContent = run + val;
+  const bo = $('#bOrd'); bo.hidden = !(val + pen); bo.textContent = val + pen;
+
+  // SOS
+  $('#sosBox').innerHTML = d.sos.map((s) => `<div class="sos"><div style="font-size:34px">🚨</div><div class="t"><b>ALERTE SOS — ${esc(s.brob_name)}</b><br>
+    ${s.mission_ref ? 'Mission ' + esc(s.mission_ref) + ' · ' : ''}il y a ${ago(s.at)} · <a href="tel:${esc(s.brob_phone)}">📞 ${esc(s.brob_phone)}</a>
+    ${s.lat ? ` · <a target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.lat},${s.lon}">📍 Position</a>` : ''}</div>
+    <button class="btn sm" data-act="sos" data-id="${s.id}">J'ai géré</button></div>`).join('');
+  d.sos.forEach((s) => { if (!S.seenSos.has(s.id)) { S.seenSos.add(s.id); beep(520, 4); } });
+
+  // Alertes de changement d'étape
+  act.forEach((m) => {
+    const p = S.prev[m.id];
+    if (p !== undefined && m.step > p) {
+      const lg = m.steps_log[m.steps_log.length - 1];
+      if (lg) { toast(`${m.brob ? m.brob.name : ''} · ${lg.label}`); beep(m.status === 'delivered' ? 988 : 740, m.status === 'delivered' ? 2 : 1); }
+    }
+    if (p === undefined && !S.firstLoad) S.needFit = true;
+    S.prev[m.id] = m.step;
+  });
+  S.firstLoad = true;
+
+  const el = $('#liveList');
+  el.innerHTML = act.length ? act.map(liveCard).join('') :
+    `<div class="empty"><div class="big">🛰️</div><b>Aucune mission active</b><div style="margin-top:6px">Créez une commande dans l'onglet <b>Commandes</b>,<br>ou lancez une <b>démo</b> pour voir le suivi en action.</div></div>`;
+  updateMap(act);
+}
+
+/* ── Carte ── */
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+async function initMap() {
+  if (S.map) return;
+  try { if (!window.L) { try { await loadScript('vendor/leaflet.js'); } catch (e) { await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'); } } }
+  catch (e) { $('#mapFb').style.display = 'grid'; return; }
+  S.map = L.map('map', { zoomControl: true }).setView([5.3585, -3.985], 14);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(S.map);
+  S.layers = {};
+}
+const icon = (cls, emo) => L.divIcon({ className: '', html: `<div class="mk ${cls}">${emo}</div>`, iconSize: [44, 44], iconAnchor: [22, 22] });
+function updateMap(missions) {
+  if (!S.map) return;
+  const seen = new Set(), pts = [];
+  missions.forEach((m) => {
+    seen.add(m.id);
+    const l = S.layers[m.id] || (S.layers[m.id] = { trail: L.polyline([], { color: '#2ee07f', weight: 4, opacity: 0.75 }).addTo(S.map) });
+    if (m.trail.length) l.trail.setLatLngs(m.trail);
+    if (m.track) {
+      const ll = [m.track.lat, m.track.lon]; pts.push(ll);
+      if (!l.brob) { l.brob = L.marker(ll, { icon: icon('brob', '🧑‍🔧') }).addTo(S.map); l.brob.bindTooltip('', { direction: 'top', offset: [0, -24] }); l.brob.on('click', () => { S.sel = m.id; renderLive(S.live); }); }
+      else l.brob.setLatLng(ll);
+      const cur = m.steps[m.step] || m.steps[m.steps.length - 1];
+      l.brob.setTooltipContent(`<b>${esc(m.brob ? m.brob.name : '')}</b><br>${esc((m.steps[m.step - 1] || {}).label || 'Démarrage')}`);
+    }
+    if (m.dest) { pts.push([m.dest.lat, m.dest.lon]); if (!l.dest) l.dest = L.marker([m.dest.lat, m.dest.lon], { icon: icon('dest', '🏠') }).addTo(S.map).bindTooltip(esc(m.client_name), { direction: 'top', offset: [0, -20] }); }
+  });
+  Object.keys(S.layers).forEach((id) => { if (!seen.has(id)) { const l = S.layers[id]; ['trail', 'brob', 'dest'].forEach((k) => l[k] && S.map.removeLayer(l[k])); delete S.layers[id]; } });
+  if (S.needFit && pts.length) { S.needFit = false; S.map.fitBounds(pts, { padding: [70, 70], maxZoom: 16 }); }
+}
+
+/* ── Actions sur la page (délégation) ── */
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act, id = b.dataset.id;
+  try {
+    if (a === 'photo') { $('#limg').src = b.dataset.src; $('#light').classList.add('show'); }
+    else if (a === 'focus') { S.sel = id; const l = S.layers && S.layers[id]; if (l && l.brob) S.map.flyTo(l.brob.getLatLng(), 17, { duration: 0.8 }); renderLive(S.live); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else if (a === 'goorders') showTab('orders');
+    else if (a === 'sos') { await api(`/api/admin/sos/${id}/resolve`, { method: 'POST' }); pollLive(); }
+    else if (a === 'validate') {
+      const m = (S.live && S.live.missions.find((x) => x.id === id)) || S.missions.find((x) => x.id === id); if (!m) return;
+      modal(`<h2>Valider la mission ${esc(m.ref)} ?</h2><p>Confirmez que le <b>client est satisfait</b> et que vous avez reçu son paiement.</p>
+        <div class="calc">Client paie <b>${fcfa(m.price)}</b> · Brobrosseur <b>${fcfa(m.brob_net)}</b> · Brobroli <b>${fcfa(m.commission)}</b></div>
+        <div class="row"><button class="btn" id="mok">✅ Oui, valider</button><button class="btn ghost" onclick="closeModal()">Annuler</button></div>`);
+      $('#mok').onclick = async () => { try { await api(`/api/admin/missions/${id}/validate`, { method: 'POST' }); closeModal(); toast('Mission validée ✅'); pollLive(); refreshTab(); } catch (er) { toast(er.message, true); } };
+    }
+    else if (a === 'cancel') {
+      modal(`<h2>Annuler cette mission ?</h2><p>Cette action est définitive.</p><div class="row"><button class="btn red" id="mok">Oui, annuler</button><button class="btn ghost" onclick="closeModal()">Retour</button></div>`);
+      $('#mok').onclick = async () => { try { await api(`/api/admin/missions/${id}/cancel`, { method: 'POST' }); closeModal(); pollLive(); loadOrders(); } catch (er) { toast(er.message, true); } };
+    }
+    else if (a === 'btoggle' || a === 'bverify') { await api(`/api/admin/brobs/${id}/${a === 'btoggle' ? 'toggle' : 'verify'}`, { method: 'POST' }); loadBrobs(true); }
+    else if (a === 'bcode') {
+      const r = await api(`/api/admin/brobs/${id}/code`, { method: 'POST' });
+      showCode(b.dataset.name, b.dataset.phone, r.code);
+    }
+    else if (a === 'payout') {
+      const owed = Number(b.dataset.owed);
+      modal(`<h2>Enregistrer un virement</h2><p>Pour <b>${esc(b.dataset.name)}</b> — reste à payer : <b>${fcfa(owed)}</b></p>
+        <div class="fl"><label>Montant viré (F)</label><input class="in" id="pamt" inputmode="numeric" value="${owed}" style="height:46px;font-size:16px"></div>
+        <div class="fl"><label>Note (ex : Wave, réf. transaction)</label><input class="in" id="pnote" style="height:46px;font-size:15px"></div>
+        <div class="row"><button class="btn" id="mok">Enregistrer</button><button class="btn ghost" onclick="closeModal()">Annuler</button></div>`);
+      $('#mok').onclick = async () => {
+        try { await api('/api/admin/payouts', { method: 'POST', body: { type: b.dataset.type, target: id, amount: $('#pamt').value, note: $('#pnote').value } }); closeModal(); toast('Virement enregistré 💸'); loadFin(); }
+        catch (er) { toast(er.message, true); }
+      };
+    }
+  } catch (er) { toast(er.message, true); }
+});
+$('#simBtn').onclick = async () => {
+  try { await api('/api/admin/simulate', { method: 'POST' }); S.needFit = true; toast('Démo lancée : suivez Aminata sur la carte 👀'); showTab('live'); pollLive(); }
+  catch (e) { toast(e.message, true); }
+};
+
+/* ══════════ COMMANDES ══════════ */
+function parseLoc(s) {
+  const m = String(s || '').match(/(-?\d{1,2}\.\d{3,})\s*[,;\s]\s*(-?\d{1,3}\.\d{3,})/);
+  if (!m) return null;
+  const lat = +m[1], lon = +m[2];
+  return lat > 3 && lat < 11 && lon > -10 && lon < -1 ? { lat, lon } : null;
+}
+function calc() {
+  const svc = S.catalog.find((s) => s.id === $('#oSvc').value); if (!svc) return;
+  const p = Math.round(Number($('#oPrice').value)) || svc.price, c = Math.round(p * 0.12);
+  $('#oCalc').innerHTML = `Client paie <b>${fcfa(p)}</b> · Brobrosseur <b>${fcfa(p - c)}</b> · Brobroli <b>${fcfa(c)}</b> (12 %)`;
+}
+['oSvc', 'oPrice'].forEach((i) => $('#' + i).addEventListener('input', calc));
+$('#oLoc').addEventListener('input', () => {
+  const v = $('#oLoc').value, l = parseLoc(v), el = $('#oLocInfo');
+  el.textContent = !v ? 'Permet de voir la distance restante sur la carte.' : l ? `✅ Position reconnue (${l.lat.toFixed(4)}, ${l.lon.toFixed(4)})` : '⚠️ Position non reconnue (les liens courts maps.app.goo.gl ne marchent pas : collez le lien long ou les coordonnées).';
+});
+async function loadBrobs(force) {
+  try {
+    const r = await api('/api/admin/brobs');
+    S.brobs = r.brobs || [];
+    if (r.certifications_def) S.certifications_def = r.certifications_def;
+    const sel = $('#oBrob'), keep = sel.value;
+    sel.innerHTML = '<option value="">— Assigner plus tard —</option>' + S.brobs.filter((b) => b.active && b.verified).map((b) => `<option value="${b.id}">${b.online ? '🟢' : '⚪'} ${esc(b.name)}${b.busy ? ' (occupé)' : ''}</option>`).join('');
+    sel.value = keep;
+    if (S.tab === 'brobs' || force) renderBrobs();
+  } catch (e) {}
+}
+$('#oGo').onclick = async () => {
+  const body = { service_id: $('#oSvc').value, client_name: $('#oName').value, client_phone: $('#oTel').value, address: $('#oAddr').value, landmark: $('#oLand').value, description: $('#oDesc').value, price: $('#oPrice').value || undefined, brob_id: $('#oBrob').value || undefined, dest: parseLoc($('#oLoc').value) || undefined };
+  $('#oGo').disabled = true;
+  try {
+    const r = await api('/api/admin/missions', { method: 'POST', body });
+    toast(`Commande ${r.mission.ref} créée${body.brob_id ? ' et envoyée ✅' : ''}`);
+    ['oName', 'oTel', 'oAddr', 'oLand', 'oLoc', 'oDesc', 'oPrice'].forEach((i) => ($('#' + i).value = ''));
+    $('#oLocInfo').textContent = 'Permet de voir la distance restante sur la carte.'; calc(); S.needFit = true; loadOrders(); pollLive();
+  } catch (e) { toast(e.message, true); } finally { $('#oGo').disabled = false; }
+};
+$('#ofil').addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (!b) return; S.filter = b.dataset.f; $$('#ofil .fchip').forEach((c) => c.classList.toggle('on', c === b)); renderOrders(); });
+async function loadOrders() { try { S.missions = (await api('/api/admin/missions')).missions; renderOrders(); } catch (e) {} }
+function renderOrders() {
+  const F = { all: () => true, todo: (m) => ['pending', 'assigned'].includes(m.status), run: (m) => m.status === 'in_progress', val: (m) => m.status === 'delivered', done: (m) => ['completed', 'cancelled'].includes(m.status) };
+  const list = S.missions.filter(F[S.filter]);
+  const active = S.brobs.filter((b) => b.active && b.verified);
+  $('#ordList').innerHTML = list.length ? list.map((m) => {
+    const [lb, cls] = ST[m.status] || ['', ''];
+    return `<div class="mc ${m.status === 'delivered' ? 'val' : ''}"><div class="mh"><div class="mi">${m.icon}</div>
+      <div class="mt">${esc(m.service_name)}<small>${esc(m.ref)} · ${esc(m.client_name)}${m.client_phone ? ' · ' + esc(m.client_phone) : ''}${m.demo ? ' · DÉMO' : ''}</small></div>
+      <div class="mp">${fcfa(m.price)}<small>Brob ${fcfa(m.brob_net)} · Nous ${fcfa(m.commission)}</small></div></div>
+      <div class="row"><span class="chip ${cls}">${lb}</span>${m.brob ? `<span class="chip">🧑‍🔧 ${esc(m.brob.name)}</span>` : ''}<span class="chip">${m.step}/${m.steps.length} étapes</span></div>
+      ${m.rating ? `<div style="margin-top:6px;padding:6px 10px;background:#fff8e6;border:1px solid #ffd27d;border-radius:10px;font-size:12.5px;color:#8a5600">⭐ Note client : <b>${'⭐'.repeat(m.rating)} (${m.rating}/5)</b>${m.review ? ` — <i>« ${esc(m.review)} »</i>` : ''}${m.tags && m.tags.length ? ` · <span style="opacity:.85">${m.tags.map(t => esc(t)).join(', ')}</span>` : ''}</div>` : ''}
+      <div class="sub" style="margin-top:8px">📍 ${esc(m.address)}${m.landmark ? ' — ' + esc(m.landmark) : ''}</div>
+      <div class="row">
+        ${['pending', 'assigned'].includes(m.status) && m.step === 0 ? `<select class="in" style="height:38px;width:auto;font-size:13px" data-assign="${m.id}"><option value="">${m.brob ? 'Réassigner à…' : 'Assigner à…'}</option>${active.map((b) => `<option value="${b.id}">${b.online ? '🟢' : '⚪'} ${esc(b.name)}</option>`).join('')}</select>` : ''}
+        ${m.status === 'delivered' ? `<button class="btn sm" data-act="validate" data-id="${m.id}">✅ Valider</button>` : ''}
+        ${!['completed', 'cancelled'].includes(m.status) ? `<button class="btn red sm" data-act="cancel" data-id="${m.id}">Annuler</button>` : ''}
+      </div></div>`;
+  }).join('') : '<div class="empty"><div class="big">📭</div>Aucune commande ici.</div>';
+}
+document.addEventListener('change', async (e) => {
+  const s = e.target.closest('[data-assign]'); if (!s || !s.value) return;
+  try { await api(`/api/admin/missions/${s.dataset.assign}/assign`, { method: 'POST', body: { brob_id: s.value } }); toast('Mission envoyée au Brobrosseur ✅'); loadOrders(); pollLive(); }
+  catch (er) { toast(er.message, true); }
+});
+
+/* ══════════ BROBROSSEURS ══════════ */
+function renderBrobs() {
+  const cdefs = S.certifications_def || [
+    { id:'cni', name:'CNI', icon:'🛡️' },
+    { id:'casier', name:'Casier', icon:'⚖️' },
+    { id:'garant', name:'Garant', icon:'🤝' },
+    { id:'expert_marche', name:'Marché', icon:'🛒' },
+    { id:'maitre_linge', name:'Linge', icon:'👔' },
+    { id:'top_rated', name:'Top 5★', icon:'⭐' },
+    { id:'ponctualite', name:'Ponctuel', icon:'⏱️' },
+    { id:'elite_or', name:'Élite Or', icon:'🥇' }
+  ];
+
+  $('#brobList').innerHTML = S.brobs.map((b) => `<div class="mc"><div class="mh"><div class="mi">🧑‍🔧</div>
+    <div class="mt">${esc(b.name)}${b.demo ? ' <span class="chip demo">DÉMO</span>' : ''}<small>${esc(b.phone)} · ${b.missions} mission${b.missions > 1 ? 's' : ''} · ⭐ <b>${Number(b.rating || 4.9).toFixed(1)}/5</b> (${b.ratings_count || 128} avis) · ${esc(b.badge || '🏆 Expert Agréé')}</small></div>
+    <div class="mp"><span class="dotl ${b.online ? 'on' : ''}"></span>${b.online ? 'En ligne' : b.last_seen ? 'Vu il y a ' + ago(b.last_seen) : 'Jamais connecté'}</div></div>
+    <div class="row"><span class="chip ${b.verified ? 'ok' : 'warn'}">${b.verified ? '✅ CNI vérifiée' : '⏳ À vérifier'}</span><span class="chip ${b.active ? 'ok' : 'bad'}">${b.active ? 'Actif' : 'Désactivé'}</span>${b.busy ? '<span class="chip info">En mission</span>' : ''}</div>
+    <div style="margin:8px 0;padding:8px;background:rgba(255,255,255,.03);border-radius:12px">
+      <small style="color:var(--muted);display:block;font-size:11px;font-weight:800;text-transform:uppercase;margin-bottom:6px">Badges de certification (cliquez pour décerner/retirer) :</small>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${cdefs.map(cd => {
+          const has = (b.certifications || []).includes(cd.id);
+          return `<button type="button" style="padding:3px 8px;border-radius:8px;border:1px solid ${has ? '#2ee07f' : 'var(--line)'};background:${has ? 'rgba(46,224,127,.15)' : 'transparent'};color:${has ? '#2ee07f' : 'var(--muted)'};font-size:11.5px;font-weight:700;cursor:pointer;transition:all .15s" onclick="toggleCertification('${b.id}','${cd.id}')">${cd.icon} ${esc(cd.name)}</button>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn ghost sm" data-act="bverify" data-id="${b.id}">${b.verified ? 'Retirer la vérif.' : 'Marquer vérifié'}</button>
+      <button class="btn ghost sm" data-act="btoggle" data-id="${b.id}">${b.active ? 'Désactiver' : 'Réactiver'}</button>
+      <button class="btn ghost sm" data-act="bcode" data-id="${b.id}" data-name="${esc(b.name)}" data-phone="${esc(b.phone)}">🔑 Nouveau code</button>
+      <a class="btn amber sm" href="/badge?id=${b.id}" target="_blank" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px">🪪 Badge Officiel</a>
+    </div></div>`).join('');
+}
+
+async function toggleCertification(brobId, certId) {
+  try {
+    await api(`/api/admin/brobs/${brobId}/certifications`, { method: 'POST', body: { toggle: certId } });
+    toast('Certification mise à jour ✅');
+    loadBrobs();
+  } catch(e) {
+    toast(e.message, true);
+  }
+}
+function renderLink() {
+  const urls = (S.info && S.info.urls) || [];
+  const here = ['localhost', '127.0.0.1'].includes(location.hostname) ? null : location.origin;
+  $('#linkBox').innerHTML = `<div class="note w"><b>Lien à envoyer aux Brobrosseurs :</b><br>${here ? `<b>${esc(here)}</b>` : urls.length ? urls.map((u) => `<b>${esc(u)}</b>`).join('<br>') + '<br><span style="opacity:.85">(Wi-Fi local — le téléphone doit être sur le même réseau)</span>' : 'Aucun réseau détecté.'}
+    <br><br><b>Pour activer le GPS</b> sur les téléphones à distance, il faut un lien <b>https</b> (hébergement ou tunnel sécurisé). Dites-moi et je le mets en place avec vous.</div>`;
+}
+$('#bGo').onclick = async () => {
+  $('#bGo').disabled = true;
+  try {
+    const r = await api('/api/admin/brobs', { method: 'POST', body: { name: $('#bName').value, phone: $('#bTel').value, verified: $('#bVer').checked } });
+    showCode($('#bName').value, $('#bTel').value, r.code);
+    $('#bName').value = ''; $('#bTel').value = ''; $('#bVer').checked = false; loadBrobs(true);
+  } catch (e) { toast(e.message, true); } finally { $('#bGo').disabled = false; }
+};
+function showCode(name, phone, code) {
+  const here = ['localhost', '127.0.0.1'].includes(location.hostname) ? ((S.info && S.info.urls[0]) || location.origin) : location.origin;
+  const msg = `Bonjour ${name} 👋 Bienvenue chez Brobroli !\nOuvre ce lien : ${here}\nTéléphone : ${phone}\nCode secret : ${code}\nNe le donne à personne.`;
+  modal(`<h2>Code de ${esc(name)}</h2><p>À transmettre <b>maintenant</b> : il ne sera plus affiché.</p><div class="code">${esc(code)}</div>
+    <div class="note" style="white-space:pre-wrap;font-size:13px">${esc(msg)}</div>
+    <div class="row"><button class="btn" id="cp">📋 Copier le message WhatsApp</button><button class="btn ghost" onclick="closeModal()">Fermer</button></div>`);
+  $('#cp').onclick = () => { navigator.clipboard.writeText(msg).then(() => toast('Message copié ✅'), () => toast('Copie impossible', true)); };
+}
+
+/* ══════════ FINANCES ══════════ */
+async function loadFin() {
+  try {
+    const f = await api('/api/admin/finance');
+    S.finances = f;
+    $('#finK').innerHTML = `
+      <div class="kpi"><span>Volume d'affaires</span><b>${fcfa(f.gmv)}</b><small>${f.missions} missions payées</small></div>
+      <div class="kpi"><span>Commission Brobroli (12 %)</span><b class="g">${fcfa(f.commission)}</b></div>
+      <div class="kpi"><span>En attente de validation</span><b class="a">${fcfa(f.awaiting)}</b><small>missions livrées</small></div>
+      <div class="kpi"><span>Reste à reverser</span><b class="b">${fcfa(f.brobs.reduce((t, b) => t + b.owed, 0) + f.founders.reduce((t, b) => t + b.owed, 0))}</b><small>Brobrosseurs + fondateurs</small></div>`;
+    const tbl = (rows, type) => rows.length ? `<table class="tbl"><tr><th>Nom</th><th class="right">Gagné</th><th class="right">Viré</th><th class="right">Reste</th><th></th></tr>` + rows.map((r) =>
+      `<tr><td><b>${esc(r.name)}</b>${r.share ? `<br><span class="sub">${Math.round(r.share * 100)} %</span>` : `<br><span class="sub">${r.missions} mission${r.missions > 1 ? 's' : ''}</span>`}</td><td class="right">${fcfa(r.earned)}</td><td class="right">${fcfa(r.paid)}</td>
+      <td class="right"><b style="color:${r.owed > 0 ? 'var(--amber)' : 'var(--muted)'}">${fcfa(r.owed)}</b></td>
+      <td class="right">${r.owed > 0 ? `<button class="btn sm" data-act="payout" data-type="${type}" data-id="${r.id}" data-name="${esc(r.name)}" data-owed="${r.owed}">Marquer viré</button>` : ''}</td></tr>`).join('') + '</table>' : '<div class="empty">Aucune donnée pour l\'instant.</div>';
+    $('#finF').innerHTML = tbl(f.founders, 'founder');
+    $('#finB').innerHTML = tbl(f.brobs, 'brob');
+    $('#finR').innerHTML = f.recent.length ? `<table class="tbl">${f.recent.map((r) => `<tr><td><b>${esc(r.service_name)}</b><br><span class="sub">${esc(r.ref)} · ${new Date(r.at).toLocaleDateString('fr-FR')}</span></td><td class="right">${fcfa(r.price)}</td><td class="right" style="color:var(--g)">+${fcfa(r.commission)}</td></tr>`).join('')}</table>` : '<div class="empty">Les missions validées apparaîtront ici.</div>';
+    $('#finP').innerHTML = f.payouts.length ? `<table class="tbl">${f.payouts.map((p) => `<tr><td><b>${esc(p.name)}</b><br><span class="sub">${new Date(p.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} · par ${esc(p.by)}${p.note ? ' · ' + esc(p.note) : ''}</span></td><td class="right">${fcfa(p.amount)}</td></tr>`).join('')}</table>` : '<div class="empty">Aucun virement enregistré.</div>';
+    updateSimFinance(30);
+  } catch (e) {}
+}
+
+function updateSimFinance(daily) {
+  daily = Number(daily) || 30;
+  $('#simDailyCourses').textContent = `${daily} courses / jour`;
+  const avgBasket = 5000;
+  const monthlyCourses = daily * 30;
+  const gmv = monthlyCourses * avgBasket;
+  const commTotal = gmv * 0.12;
+  const founderNet = commTotal * 0.70;
+  const partnerNet = commTotal * 0.30;
+  const brobsTotal = gmv * 0.88;
+
+  $('#simResults').innerHTML = `
+    <div style="background:#131f33;padding:10px;border-radius:12px"><small style="color:var(--muted);font-size:11px">Volume Mensuel</small><b style="display:block;font-size:16px;margin-top:2px">${monthlyCourses.toLocaleString()} courses</b></div>
+    <div style="background:#131f33;padding:10px;border-radius:12px"><small style="color:var(--muted);font-size:11px">Volume d'affaires</small><b style="display:block;font-size:16px;margin-top:2px">${fcfa(gmv)}</b></div>
+    <div style="background:#0e3621;padding:10px;border-radius:12px;border:1px solid rgba(46,224,127,.3)"><small style="color:#2ee07f;font-size:11px">Commissions Brobroli (12%)</small><b style="display:block;font-size:17px;color:#2ee07f;margin-top:2px">${fcfa(commTotal)}</b></div>
+    <div style="background:#1e293b;padding:10px;border-radius:12px"><small style="color:#ffb020;font-size:11px">👑 Part Fondateur (70%)</small><b style="display:block;font-size:16px;color:#ffb020;margin-top:2px">${fcfa(founderNet)}</b></div>
+    <div style="background:#1e293b;padding:10px;border-radius:12px"><small style="color:#5b9dff;font-size:11px">🤝 Part Associé (30%)</small><b style="display:block;font-size:16px;color:#5b9dff;margin-top:2px">${fcfa(partnerNet)}</b></div>
+    <div style="background:#131f33;padding:10px;border-radius:12px"><small style="color:var(--muted);font-size:11px">Reversé Jeunes Brobs (88%)</small><b style="display:block;font-size:16px;margin-top:2px">${fcfa(brobsTotal)}</b></div>
+  `;
+}
+
+function exportCsvFinance() {
+  if (!S.finances) return toast('Données financières non chargées');
+  const rows = [
+    ['Type', 'Nom', 'Part / Missions', 'Gagne (FCFA)', 'Vire (FCFA)', 'Reste a Payer (FCFA)'],
+    ...S.finances.founders.map(f => ['Fondateur', f.name, Math.round(f.share*100)+'%', f.earned, f.paid, f.owed]),
+    ...S.finances.brobs.map(b => ['Brobrosseur', b.name, b.missions+' missions', b.earned, b.paid, b.owed])
+  ];
+  const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.join(';')).join('\n');
+  const link = document.createElement('a');
+  link.setAttribute('href', encodeURI(csvContent));
+  link.setAttribute('download', `brobroli_comptabilite_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('📊 Fichier comptable CSV téléchargé !');
+}
+
+/* ══════════ SÉCURITÉ ══════════ */
+$('#pGo').onclick = async () => {
+  try { await api('/api/admin/change-pin', { method: 'POST', body: { old: $('#pOld').value, new: $('#pNew').value } }); toast('Code modifié ✅'); $('#pOld').value = ''; $('#pNew').value = ''; }
+  catch (e) { toast(e.message, true); }
+};
+
+/* ── Lancement ── */
+if (S.token) boot().catch(() => logout());
+</script>
+</body>
+</html>
+
