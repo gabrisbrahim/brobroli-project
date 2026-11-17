@@ -880,7 +880,7 @@ function viewHome() {
       ${filtered.map((s) => `
         <div class="svc-item">
           <div class="svc-ic" style="overflow:hidden;position:relative">
-            ${s.img ? `<img src="${s.img}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none;font-size:22px">${s.icon}</span>` : `<span style="font-size:22px">${s.icon}</span>`}
+            ${s.img ? `<img src="${s.img}" alt="${esc(s.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none;font-size:22px">${s.icon}</span>` : `<span style="font-size:22px">${s.icon}</span>`}
           </div>
           <div class="svc-info">
             <b>${esc(s.name)} ${s.popular ? '<span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:6px;font-weight:800;margin-left:4px">🔥 Populaire</span>' : ''}</b>

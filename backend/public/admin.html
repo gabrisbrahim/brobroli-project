@@ -200,8 +200,8 @@ summary::before{content:"▸ "}details[open] summary::before{content:"▾ "}
     <h1>Brobroli · Fondateurs</h1>
     <div class="sub">Gravir les marches · Gagner sa vie · Suivi Temps Réel Abidjan</div>
     <div class="who">
-      <label><input type="radio" name="who" value="founder" checked><span>👑 Fondateur<small>70 %</small></span></label>
-      <label><input type="radio" name="who" value="partner"><span>🤝 Associé<small>30 %</small></span></label>
+      <label><input type="radio" name="who" value="founder" checked aria-label="Fondateur principal 70%"><span>👑 Fondateur<small>70 %</small></span></label>
+      <label><input type="radio" name="who" value="partner" aria-label="Associé fondateur 30%"><span>🤝 Associé<small>30 %</small></span></label>
     </div>
     <input class="in" id="pin" type="password" inputmode="numeric" placeholder="Code d'accès (ex: 707070)" autocomplete="current-password">
     <div class="lerr" id="lerr"></div>
@@ -588,7 +588,7 @@ function liveCard(m) {
     const st = i < done ? 'done' : i === done && m.status !== 'delivered' ? 'cur' : '';
     return `<div class="sp ${st}"><span>${i < done ? '✅' : i === done ? '⏳' : s.icon}</span><div><div>${i + 1}. ${esc(s.label)}</div>${lg ? `<small>à ${hhmm(lg.at)}</small>` : i === done && m.status !== 'delivered' ? '<small>Prochaine étape</small>' : ''}</div></div>`;
   }).join('');
-  const photos = m.steps_log.filter((l) => l.photo).map((l) => `<img src="/api/admin/photo/${esc(l.photo)}?token=${S.token}" data-act="photo" data-src="/api/admin/photo/${esc(l.photo)}?token=${S.token}" title="${esc(l.label)}">`).join('');
+  const photos = m.steps_log.filter((l) => l.photo).map((l) => `<img src="/api/admin/photo/${esc(l.photo)}?token=${S.token}" alt="Justificatif ${esc(l.label)}" data-act="photo" data-src="/api/admin/photo/${esc(l.photo)}?token=${S.token}" title="${esc(l.label)}">`).join('');
   const nowTxt = m.status === 'delivered' ? ['🎉', 'Livré au client', `Attend votre validation (depuis ${ago(lastLog && lastLog.at)})`]
     : m.status === 'pending' ? ['⏳', 'Pas encore assignée', 'Choisissez un Brobrosseur dans l\'onglet Commandes']
     : m.status === 'assigned' ? ['📲', 'Envoyée à ' + (m.brob ? m.brob.name : '…'), 'Le Brobrosseur n\'a pas encore accepté']
