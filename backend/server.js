@@ -608,37 +608,6 @@ async function api(req, res, url, p, method) {
     });
   }
 
-  // Changement en 1 clic du logo officiel sur toute l'application
-  if (method === 'POST' && p === '/api/public/set-logo') {
-    const b = await readBody(req, 5000);
-    const allowed = [
-      'logo-ultime-definitif.jpg',
-      'logo-ultime-iso.jpg',
-      'logo-master-marble.jpg',
-      'logo-master-titanium.jpg',
-      'logo-proto-1-ascension.jpg',
-      'logo-proto-2-batisseur.jpg',
-      'logo-proto-3-monogramme.jpg',
-      'logo-proto-4-ecusson.jpg'
-    ];
-    if (!allowed.includes(b.file)) return send(res, 400, { error: 'Prototype inconnu' });
-    const src = path.join(PUBLIC_DIR, 'assets', b.file);
-    if (!fs.existsSync(src)) return send(res, 404, { error: 'Fichier introuvable' });
-    const targets = [
-      path.join(PUBLIC_DIR, 'assets', 'logo.jpg'),
-      path.join(PUBLIC_DIR, 'Visuels_et_Logo', 'logo.jpg'),
-      'C:\\Users\\gabri\\Desktop\\DOSSIER_COMPLET_BROBROLI_APP\\Visuels_et_Logo\\logo.jpg',
-      'C:\\Users\\gabri\\Desktop\\DOSSIER_COMPLET_BROBROLI_APP\\Code_Source_Application\\public\\assets\\logo.jpg',
-      'C:\\Users\\gabri\\Desktop\\DOSSIER_COMPLET_BROBROLI_APP\\LES_3_APPLICATIONS_SEPAREES\\1_App_Client\\assets\\logo.jpg',
-      'C:\\Users\\gabri\\Desktop\\DOSSIER_COMPLET_BROBROLI_APP\\LES_3_APPLICATIONS_SEPAREES\\2_App_Brobrosseur\\assets\\logo.jpg',
-      'C:\\Users\\gabri\\Desktop\\DOSSIER_COMPLET_BROBROLI_APP\\LES_3_APPLICATIONS_SEPAREES\\3_App_Fondateur_70_30\\assets\\logo.jpg'
-    ];
-    for (const t of targets) {
-      try { fs.copyFileSync(src, t); } catch (e) {}
-    }
-    return send(res, 200, { ok: true, active_logo: b.file });
-  }
-
   // Messagerie & Chat direct entre Client et Brobrosseur
   if ((rm = p.match(/^\/api\/missions\/([\w-]+)\/chat$/))) {
     const mission = db.missions.find((x) => x.id === rm[1]);
