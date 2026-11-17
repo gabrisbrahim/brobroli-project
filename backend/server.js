@@ -527,7 +527,14 @@ async function api(req, res, url, p, method) {
     const id = p.split('/')[4];
     const mission = db.missions.find((x) => x.id === id);
     if (!mission) return send(res, 404, { error: 'Mission introuvable' });
-    mission.status = 'completed'; mission.completed_at = Date.now(); mission.updated_at = Date.now(); save();
+    mission.status = 'completed'; mission.completed_at = Date.now(); mission.updated_at = Date.now();
+    const brob = db.brobs.find((x) => x.id === mission.brob_id);
+    if (brob) {
+      payment.releaseEscrowToBrobrosseur({ mission, brob }).catch((err) => {
+        console.warn('Note versement payout:', err.message);
+      });
+    }
+    save();
     return send(res, 200, { ok: true });
   }
 

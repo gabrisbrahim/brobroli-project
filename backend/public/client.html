@@ -264,6 +264,87 @@ textarea.in{height:auto;min-height:80px;padding:12px 14px}
   </div>
 </div>
 
+<!-- Modal Reçu Officiel & Séquestre -->
+<div id="receiptModal" style="position:fixed;inset:0;background:rgba(6,22,13,.78);display:none;align-items:flex-end;justify-content:center;z-index:100;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeReceiptModal()">
+  <div class="rate-sheet" style="max-height:92vh;overflow-y:auto;background:#fff">
+    <div style="text-align:center;border-bottom:1.5px dashed var(--line);padding-bottom:14px;margin-bottom:14px">
+      <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:6px">
+        <img src="assets/logo.jpg?v=3" alt="Brobroli" style="width:36px;height:36px;border-radius:10px;object-fit:cover">
+        <h2 style="font-size:20px;font-weight:900;color:var(--g1);margin:0">Brobroli CI</h2>
+      </div>
+      <p style="font-size:12px;color:var(--muted);font-weight:600">Reçu Officiel de Séquestre Mobile Money</p>
+      <div style="display:inline-block;margin-top:6px;background:#e8f7ee;color:var(--g1);border:1px solid #bce4ca;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px" id="rcptBadgeStatus">
+        🔒 Fonds Bloqués sous Séquestre
+      </div>
+    </div>
+
+    <!-- Détails du reçu -->
+    <div style="background:#f8faf9;border-radius:16px;padding:14px;border:1px solid var(--line);margin-bottom:14px;font-size:12.5px;display:grid;gap:8px">
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">Référence Course :</span>
+        <b id="rcptRef" style="color:var(--g1);font-family:monospace;font-size:14px">BR-0102</b>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">Identifiant Transaction :</span>
+        <span id="rcptTxId" style="font-family:monospace;color:var(--ink)">TX-WAV-82910</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">Date & Heure :</span>
+        <span id="rcptDate">17/11/2026 à 21:50</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">Moyen de paiement :</span>
+        <b id="rcptMethod">🌊 Wave Business CI</b>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">Client :</span>
+        <b id="rcptClient">Mme Koné (0708091011)</b>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">Adresse :</span>
+        <span id="rcptAddress" style="text-align:right;max-width:60%">Cocody Angré</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">Brobrosseur Agréé :</span>
+        <b id="rcptBrob">Aminata Koné (🏆 Expert Agréé)</b>
+      </div>
+    </div>
+
+    <!-- Répartition financière -->
+    <div style="background:#eef8f1;border-radius:16px;padding:14px;border:1.5px solid #c2eccf;margin-bottom:14px;font-size:13px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span>Prestation : <b id="rcptSvcName">Courses Grand Marché</b></span>
+        <b id="rcptPrestaPrice">5 000 F</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;color:var(--muted)">
+        <span>💪 Dont 88 % versés au prestataire :</span>
+        <span id="rcptBrobNet">4 400 F</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;color:var(--muted)">
+        <span>🏛️ Dont 12 % frais & garantie Brobroli :</span>
+        <span id="rcptFee">600 F</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px" id="rcptVivresRow">
+        <span style="color:#0a6932">🛒 Avance vivres / provisions (0 % com.) :</span>
+        <b id="rcptVivresPrice" style="color:#0a6932">+ 0 F</b>
+      </div>
+      <div style="border-top:1.5px dashed #bce4ca;padding-top:8px;margin-top:6px;display:flex;justify-content:space-between;align-items:center">
+        <b style="font-size:14px;color:var(--g1)">Total Débité & Sécurisé :</b>
+        <b style="font-size:22px;color:var(--g1);font-weight:900" id="rcptTotal">5 000 F</b>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <button class="btn" style="background:#1ebd5c;color:#fff;font-size:13px" onclick="shareReceiptWhatsApp()">📲 WhatsApp</button>
+      <button class="btn" style="background:#091d12;color:#fff;font-size:13px" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
+
+    <button class="btn block" style="background:#fff3f3;color:#c53030;border:1px solid #fed7d7;box-shadow:none;font-size:12px;height:38px;margin-bottom:8px" onclick="reportDispute()">⚠️ Signaler un problème / Litige</button>
+
+    <button class="btn block" style="background:#f0f4f1;color:var(--muted);box-shadow:none" onclick="closeReceiptModal()">Fermer</button>
+  </div>
+</div>
+
 <script>
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -499,6 +580,74 @@ async function executeOrder() {
   closeConfirmModal();
   await submitOrder();
   if (btn) { btn.disabled = false; btn.textContent = '🔒 Confirmer & Payer sous Séquestre'; }
+}
+
+let currentReceiptMission = null;
+
+function openReceiptModal(missionId) {
+  const m = missions.find(x => x.id === missionId) || missions[0];
+  if (!m) return toast('Mission introuvable');
+  currentReceiptMission = m;
+
+  $('#rcptRef').textContent = m.ref || 'BR-0102';
+  $('#rcptTxId').textContent = 'TX-' + (m.payment_method === 'orange_money' ? 'OM' : 'WAV') + '-' + (m.ref || 'BR').replace('BR-','') + '-' + (m.id || '').slice(-4);
+  const d = m.steps_log && m.steps_log[0] ? new Date(m.steps_log[0].at) : new Date();
+  $('#rcptDate').textContent = d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  $('#rcptMethod').textContent = m.payment_method === 'orange_money' ? '🟠 Orange Money (CinetPay)' : '🌊 Wave Business CI';
+  $('#rcptClient').textContent = (m.client_name || 'Client') + ' (' + (m.client_phone || '0708091011') + ')';
+  $('#rcptAddress').textContent = (m.address || 'Abidjan') + (m.landmark ? ' (' + m.landmark + ')' : '');
+  $('#rcptBrob').textContent = (m.brob_name || 'Aminata Koné') + ' (' + (m.brob_badge || '🏆 Expert Agréé') + ')';
+
+  const isCompleted = m.status === 'completed';
+  $('#rcptBadgeStatus').innerHTML = isCompleted ? '✅ Séquestre Débloqué & Versé' : '🔒 Fonds Bloqués sous Séquestre';
+  $('#rcptBadgeStatus').style.background = isCompleted ? '#e8f7ee' : '#fff8eb';
+  $('#rcptBadgeStatus').style.color = isCompleted ? 'var(--g1)' : '#9a6200';
+  $('#rcptBadgeStatus').style.borderColor = isCompleted ? '#bce4ca' : '#fed27b';
+
+  const presta = m.price || 5000;
+  const net = m.brob_net || Math.round(presta * 0.88);
+  const fee = presta - net;
+  const vivres = m.budget_vivres || 0;
+  const total = presta + vivres;
+
+  $('#rcptSvcName').textContent = m.service_name || 'Prestation';
+  $('#rcptPrestaPrice').textContent = fcfa(presta);
+  $('#rcptBrobNet').textContent = fcfa(net);
+  $('#rcptFee').textContent = fcfa(fee);
+  if (vivres > 0) {
+    $('#rcptVivresPrice').textContent = '+ ' + fcfa(vivres);
+    $('#rcptVivresRow').style.display = 'flex';
+  } else {
+    $('#rcptVivresRow').style.display = 'none';
+  }
+  $('#rcptTotal').textContent = fcfa(total);
+
+  $('#receiptModal').style.display = 'flex';
+}
+
+function closeReceiptModal() {
+  $('#receiptModal').style.display = 'none';
+}
+
+function shareReceiptWhatsApp() {
+  if (!currentReceiptMission) return;
+  const m = currentReceiptMission;
+  const total = fcfa((m.price || 0) + (m.budget_vivres || 0));
+  const text = `🧾 *REÇU OFFICIEL BROBROLI CI*\n` +
+    `• Réf : *${m.ref}*\n` +
+    `• Service : ${m.service_name}\n` +
+    `• Prestataire : ${m.brob_name} (${m.brob_badge || 'Agréé'})\n` +
+    `• Montant sous séquestre : *${total}*\n` +
+    `• Statut : ${m.status === 'completed' ? '✅ Livré & Paiement validé' : '🔒 Protégé sous séquestre Brobroli'}\n` +
+    `• Vérification en ligne : https://vanelli.vanellii.com/client?track=${m.id}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function reportDispute() {
+  if (!currentReceiptMission) return;
+  const m = currentReceiptMission;
+  const text = `Bonjour Support Brobroli, je souhaite signaler un problème concernant le paiement sous séquestre de ma course ${m.ref} (${m.service_name}).`;
+  window.open(`https://wa.me/2250700000000?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 // PWA Service Worker Registration
@@ -984,6 +1133,19 @@ function viewTrack() {
           <b style="font-size:18px;color:var(--g1);font-weight:900">${fcfa(m.price + (m.budget_vivres || 0))}</b>
           ${m.budget_vivres > 0 ? `<small style="display:block;font-size:11px;color:var(--muted)">dont ${fcfa(m.budget_vivres)} vivres</small>` : ''}
         </div>
+      </div>
+
+      <!-- Bandeau Séquestre & Reçu -->
+      <div style="margin-top:10px;padding:10px 14px;background:#eef8f1;border-radius:14px;border:1px solid #c4eccf;display:flex;justify-content:space-between;align-items:center;font-size:12px">
+        <div>
+          <span style="color:var(--g1);font-weight:800;display:flex;align-items:center;gap:5px">
+            🔒 Séquestre Garanti (${fcfa(m.price + (m.budget_vivres || 0))})
+          </span>
+          <small style="color:var(--muted);display:block;margin-top:2px">
+            ${m.status === 'completed' ? '✅ Fonds débloqués pour le Brobrosseur' : 'Fonds protégés jusqu\'à confirmation'}
+          </small>
+        </div>
+        <button type="button" class="btn sm" style="height:30px;padding:0 10px;font-size:11px;background:#fff;color:var(--g1);border:1.5px solid var(--g2);box-shadow:none" onclick="openReceiptModal('${m.id}')">🧾 Reçu Officiel</button>
       </div>
 
       <!-- Fiche Prestataire & Contact Direct -->
