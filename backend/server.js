@@ -12,8 +12,11 @@ const crypto = require('crypto');
 const os = require('os');
 
 const PORT = Number(process.env.PORT) || 5000;
+const APP_URL = process.env.APP_URL || ('http://localhost:' + PORT);
 const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '';
 const COMMISSION_RATE = 0.12;
+
+const payment = require('./payment');
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const DATA_DIR = path.join(__dirname, 'data');
@@ -473,7 +476,52 @@ async function api(req, res, url, p, method) {
       dest: { lat: 5.3610, lon: -3.9840 },
     });
     if (r.error) return send(res, 400, r);
-    return send(res, 201, { mission: r.mission });
+
+    // Initialisation du séquestre de paiement (CinetPay ou Wave)
+    let paymentSession = null;
+    try {
+      paymentSession = await payment.initiateEscrowPayment({
+        provider: b.payment_method || 'wave',
+        mission: r.mission,
+        appUrl: APP_URL
+      });
+    } catch (err) {
+      console.warn('Note: Session de paiement en mode local:', err.message);
+    }
+
+    return send(res, 201, { mission: r.mission, payment: paymentSession });
+  }
+
+  // Initialisation d'une session de paiement séquestre
+  if (method === 'POST' && p === '/api/payments/checkout') {
+    const b = await readBody(req, 10000);
+    const mission = db.missions.find((x) => x.id === b.mission_id);
+    if (!mission) return send(res, 404, { error: 'Mission introuvable' });
+    try {
+      const sess = await payment.initiateEscrowPayment({
+        provider: b.provider || mission.payment_method || 'wave',
+        mission,
+        appUrl: APP_URL
+      });
+      return send(res, 200, sess);
+    } catch (err) {
+      return send(res, 400, { error: err.message });
+    }
+  }
+
+  // Webhooks CinetPay (Orange Money, MTN, Moov)
+  if (method === 'POST' && p === '/api/payments/webhook/cinetpay') {
+    const b = await readBody(req, 20000);
+    const txId = b.cpm_trans_id || b.transaction_id;
+    console.log('[Webhook CinetPay] Notification reçue pour transaction:', txId);
+    return send(res, 200, { ok: true });
+  }
+
+  // Webhooks Wave Business
+  if (method === 'POST' && p === '/api/payments/webhook/wave') {
+    const b = await readBody(req, 20000);
+    console.log('[Webhook Wave] Notification reçue:', b.type || 'payment.succeeded');
+    return send(res, 200, { ok: true });
   }
   if (method === 'POST' && p.match(/^\/api\/client\/missions\/([\w-]+)\/validate$/)) {
     const id = p.split('/')[4];
@@ -514,6 +562,11 @@ async function api(req, res, url, p, method) {
       else if (brob.rating >= 4.5) brob.badge = '🏆 Expert Agréé';
       else if (brob.rating >= 4.0) brob.badge = '🎖️ Confirmé';
       else brob.badge = '🛡️ Certifié CNI';
+
+      // Déclenchement automatique du reversement séquestre (88% net) au Brobrosseur
+      payment.releaseEscrowToBrobrosseur({ mission, brob }).catch((err) => {
+        console.warn('Note versement payout Brobrosseur:', err.message);
+      });
     }
     save();
     return send(res, 200, { ok: true, rating: stars, brob_rating: brob ? brob.rating : 5, brob_badge: brob ? brob.badge : '🏆 Expert Agréé' });

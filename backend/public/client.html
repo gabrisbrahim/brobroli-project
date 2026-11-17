@@ -708,6 +708,11 @@ async function submitOrder() {
     const r = await fetch(API_BASE + '/api/client/missions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json();
     if (!r.ok) return toast(j.error || 'Erreur');
+    if (j.payment && j.payment.mode === 'live' && (j.payment.payment_url || j.payment.wave_launch_url)) {
+      toast('Redirection vers ' + (paymentMethod === 'wave' ? 'Wave' : 'CinetPay') + '…');
+      setTimeout(() => { location.href = j.payment.payment_url || j.payment.wave_launch_url; }, 800);
+      return;
+    }
     toast('🎉 Commande validée sous séquestre & envoyée au Brobrosseur !');
     await load();
   } catch (e) {
