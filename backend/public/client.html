@@ -202,6 +202,68 @@ textarea.in{height:auto;min-height:80px;padding:12px 14px}
   </div>
 </div>
 
+<!-- Modal Confirmation Commande Client -->
+<div id="confirmModal" style="position:fixed;inset:0;background:rgba(6,22,13,.75);display:none;align-items:flex-end;justify-content:center;z-index:100;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeConfirmModal()">
+  <div class="rate-sheet" style="max-height:90vh;overflow-y:auto">
+    <div class="rate-header" style="text-align:left;display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="width:48px;height:48px;border-radius:14px;background:#e8f7ee;display:grid;place-items:center;font-size:24px" id="confIcon">🛒</div>
+      <div>
+        <h2 id="confSvcName" style="font-size:17px;font-weight:900">Confirmation de commande</h2>
+        <p style="font-size:12px;color:var(--muted)">Vérifiez vos informations avant de bloquer les fonds</p>
+      </div>
+    </div>
+
+    <div style="background:#f4f8f5;border-radius:16px;padding:14px;border:1px solid var(--line);margin-bottom:12px;font-size:13px;display:grid;gap:8px">
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">👤 Client :</span>
+        <b id="confClientName">Mme Koné</b>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">📱 WhatsApp :</span>
+        <b id="confClientPhone">07 08 09 10 11</b>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:var(--muted)">📍 Adresse :</span>
+        <b id="confClientAddr" style="text-align:right;max-width:60%">Cocody Angré</b>
+      </div>
+      <div style="display:flex;justify-content:space-between" id="confLandmarkRow">
+        <span style="color:var(--muted)">🚩 Repère :</span>
+        <span id="confClientLand" style="text-align:right;max-width:60%">Après carrefour</span>
+      </div>
+    </div>
+
+    <!-- Répartition financière sous séquestre -->
+    <div style="background:#e8f7ee;border-radius:16px;padding:14px;border:1.5px solid #c2eccf;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px">
+        <span>Forfait prestation :</span>
+        <b id="confPricePresta">5 000 F</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;color:var(--muted)">
+        <span>💪 Net reversé au Brobrosseur (88 %) :</span>
+        <b id="confBrobNet">4 400 F</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;color:#0e5c2d" id="confVivresRow">
+        <span>🛒 Avance budget vivres (0 % com.) :</span>
+        <b id="confPriceVivres">+ 0 F</b>
+      </div>
+      <div style="border-top:1px dashed #bce4ca;padding-top:8px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <b style="font-size:14px;color:var(--g1)">Total sous séquestre</b>
+          <small style="display:block;color:var(--muted);font-size:11px" id="confPayMethod">Paiement Wave</small>
+        </div>
+        <b style="font-size:20px;color:var(--g1);font-weight:900" id="confTotalPrice">5 000 F</b>
+      </div>
+    </div>
+
+    <div style="font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:14px;line-height:1.4">
+      🛡️ <b>Protection Séquestre Garantie :</b> Vos fonds restent sécurisés. Ils ne seront débloqués pour le Brobrosseur qu'après votre validation à la livraison.
+    </div>
+
+    <button class="btn block" style="margin-bottom:8px" id="confSubmitBtn" onclick="executeOrder()">🔒 Confirmer & Payer sous Séquestre</button>
+    <button class="btn block" style="background:#f0f4f1;color:var(--muted);box-shadow:none" onclick="closeConfirmModal()">✏️ Modifier la commande</button>
+  </div>
+</div>
+
 <script>
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -311,6 +373,132 @@ function computeSmartPrice(mins = customDuration, effort = customEffort, desc = 
   const heavyWords = /(lourd|déménag|escalier|étage|sac de riz|gaz|carton|meuble|jardin|brousse|urgent|nuit)/i;
   const keywordBonus = heavyWords.test(txt) && effort === 'leger' ? 500 : 0;
   return Math.max(2500, Math.round((base + effortBonus + keywordBonus) / 500) * 500);
+}
+
+/* ── Communes d'Abidjan & Gestion du Profil Client Mémorisé ── */
+const ABIDJAN_COMMUNES = [
+  'Cocody Angré (8e, 7e, 9e tranche, CHU, Djibi)',
+  'Cocody Riviera (Palmeraie, Bonoumin, Faya, Abatta)',
+  'Cocody Deux-Plateaux (Vallons, Aghien, ENA)',
+  'Cocody Centre (St-Jean, Danga, Ambassades)',
+  'Plateau (Centre-ville & Affaires)',
+  'Marcory (Zone 4, Biétry, Résidentiel, Hibiscus)',
+  'Koumassi (Remblais, Prodomo)',
+  'Treichville (Arras, Avenue 8, Zone portuaire)',
+  'Yopougon (Maroc, Niangon, Sideci, Toit Rouge)',
+  'Bingerville'
+];
+
+function loadClientProfile() {
+  try {
+    const raw = localStorage.getItem('bro_client_profile');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    name: 'Mme Koné',
+    phone: '07 08 09 10 11',
+    commune: 'Cocody Angré (8e, 7e, 9e tranche, CHU, Djibi)',
+    address: 'Cocody Angré 8e tranche',
+    landmark: 'Après le carrefour Bluetooth, portail vert'
+  };
+}
+let clientProfile = loadClientProfile();
+
+function saveClientProfile(updates) {
+  clientProfile = { ...clientProfile, ...updates };
+  try {
+    localStorage.setItem('bro_client_profile', JSON.stringify(clientProfile));
+  } catch(e) {}
+}
+
+function onCommuneChange(val) {
+  saveClientProfile({ commune: val });
+  const addrIn = $('#cAddr');
+  if (addrIn && (!addrIn.value || addrIn.value === 'Cocody Angré 8e tranche' || addrIn.value.startsWith('📍 Position GPS'))) {
+    addrIn.value = val;
+    saveClientProfile({ address: val });
+  }
+}
+
+function detectClientGps() {
+  const btn = $('#gpsBtn');
+  if (!navigator.geolocation) return toast('La géolocalisation n\'est pas disponible');
+  if (btn) { btn.innerHTML = '⏳ Localisation…'; btn.disabled = true; }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const acc = Math.round(pos.coords.accuracy);
+      window.lastClientCoords = { lat, lon, acc };
+      const comm = ($('#cCommune') && $('#cCommune').value) ? $('#cCommune').value.split(' ')[0] : 'Abidjan';
+      const addrIn = $('#cAddr');
+      if (addrIn) {
+        addrIn.value = `${comm} (GPS: ${lat.toFixed(4)}, ${lon.toFixed(4)} · ±${acc}m)`;
+        saveClientProfile({ address: addrIn.value });
+      }
+      toast(`📍 Position GPS détectée (précision ~${acc}m) !`);
+      if (btn) { btn.innerHTML = '✅ GPS Détecté'; btn.disabled = false; }
+    },
+    (err) => {
+      toast('Impossible d\'obtenir le GPS : activez la géolocalisation', true);
+      if (btn) { btn.innerHTML = '📍 Détecter par GPS'; btn.disabled = false; }
+    },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+  );
+}
+
+function openConfirmModal() {
+  const svc = catalog.find((s) => s.id === chosenSvc) || catalog[0];
+  const isCustom = svc.id === 'mission-speciale';
+  const descVal = $('#cDesc') ? $('#cDesc').value : '';
+  const price = isCustom ? computeSmartPrice(customDuration, customEffort, descVal) : svc.price;
+  const brobNet = Math.round(price * 0.88);
+  const total = price + vivresBudget;
+  
+  const name = ($('#cName') ? $('#cName').value : '') || clientProfile.name || 'Client Brobroli';
+  const phone = ($('#cTel') ? $('#cTel').value : '') || clientProfile.phone || '07 08 09 10 11';
+  const commune = ($('#cCommune') ? $('#cCommune').value : '') || clientProfile.commune || 'Cocody Angré';
+  const addr = ($('#cAddr') ? $('#cAddr').value : '') || clientProfile.address || commune;
+  const landmark = ($('#cLand') ? $('#cLand').value : '') || clientProfile.landmark || '';
+
+  saveClientProfile({ name, phone, commune, address: addr, landmark });
+
+  $('#confIcon').textContent = isCustom ? '✨' : svc.icon;
+  $('#confSvcName').textContent = isCustom ? (customTitle || 'Mission Spéciale Sur-Mesure') : svc.name;
+  $('#confClientName').textContent = name;
+  $('#confClientPhone').textContent = phone;
+  $('#confClientAddr').textContent = addr;
+  if (landmark) {
+    $('#confClientLand').textContent = landmark;
+    $('#confLandmarkRow').style.display = 'flex';
+  } else {
+    $('#confLandmarkRow').style.display = 'none';
+  }
+
+  $('#confPricePresta').textContent = fcfa(price);
+  $('#confBrobNet').textContent = fcfa(brobNet);
+  if (vivresBudget > 0) {
+    $('#confPriceVivres').textContent = '+ ' + fcfa(vivresBudget);
+    $('#confVivresRow').style.display = 'flex';
+  } else {
+    $('#confVivresRow').style.display = 'none';
+  }
+  $('#confPayMethod').textContent = paymentMethod === 'wave' ? '🌊 Compte Wave Business (Instantané)' : '🟠 Orange Money (CinetPay)';
+  $('#confTotalPrice').textContent = fcfa(total);
+
+  $('#confirmModal').style.display = 'flex';
+}
+
+function closeConfirmModal() {
+  $('#confirmModal').style.display = 'none';
+}
+
+async function executeOrder() {
+  const btn = $('#confSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sécurisation des fonds…'; }
+  closeConfirmModal();
+  await submitOrder();
+  if (btn) { btn.disabled = false; btn.textContent = '🔒 Confirmer & Payer sous Séquestre'; }
 }
 
 // PWA Service Worker Registration
@@ -614,10 +802,44 @@ function viewOrder() {
         </div>
       ` : ''}
 
-      <div class="fl"><label>Votre nom complet</label><input class="in" id="cName" value="Mme Koné"></div>
-      <div class="fl"><label>Téléphone WhatsApp</label><input class="in" id="cTel" value="07 08 09 10 11"></div>
-      <div class="fl"><label>Quartier & Adresse de livraison</label><input class="in" id="cAddr" value="Cocody Angré 8e tranche"></div>
-      <div class="fl"><label>Repère précis (Pharmacie, carrefour, portail)</label><input class="in" id="cLand" value="Après le carrefour Bluetooth, portail vert"></div>
+      <!-- Coordonnées & Localisation avec mémorisation -->
+      <div style="background:#f8faf9;border-radius:20px;border:1.5px solid var(--line);padding:14px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <label style="color:var(--g1);font-weight:900;margin:0;font-size:12.5px">📍 Vos Coordonnées & Lieu de Livraison</label>
+          <span style="font-size:11px;color:var(--g2);font-weight:800;background:#e8f7ee;padding:3px 8px;border-radius:99px">💾 Mémorisé</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Votre Nom</label>
+            <input class="in" id="cName" value="${esc(clientProfile.name)}" placeholder="Ex : Mme Koné" oninput="saveClientProfile({name:this.value})">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">WhatsApp</label>
+            <input class="in" id="cTel" type="tel" value="${esc(clientProfile.phone)}" placeholder="07 08 09 10 11" oninput="saveClientProfile({phone:this.value})">
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Commune d'Abidjan</label>
+          <select class="in" id="cCommune" onchange="onCommuneChange(this.value)">
+            ${ABIDJAN_COMMUNES.map(c => `<option value="${c}" ${clientProfile.commune === c ? 'selected' : ''}>${c}</option>`).join('')}
+          </select>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:0">Quartier & Adresse précise</label>
+            <button type="button" id="gpsBtn" onclick="detectClientGps()" style="background:#e8f7ee;color:var(--g1);border:1px solid var(--g2);border-radius:99px;font-size:11px;font-weight:800;padding:3px 10px;cursor:pointer">📍 Détecter par GPS</button>
+          </div>
+          <input class="in" id="cAddr" value="${esc(clientProfile.address)}" placeholder="Ex : Cocody Angré 8e tranche, Cité Belle Vue" oninput="saveClientProfile({address:this.value})">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Repère visuel (Carrefour, pharmacie, portail)</label>
+          <input class="in" id="cLand" value="${esc(clientProfile.landmark)}" placeholder="Ex : 100m après le carrefour Bluetooth, portail vert" oninput="saveClientProfile({landmark:this.value})">
+        </div>
+      </div>
       
       <div class="fl">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
@@ -657,7 +879,7 @@ function viewOrder() {
         </div>
       </div>
 
-      <button class="btn block" onclick="submitOrder()">🚀 Payer sous séquestre & Lancer la mission</button>
+      <button class="btn block" onclick="openConfirmModal()">🔍 Vérifier & Payer sous Séquestre →</button>
     </div>`;
 }
 
@@ -688,9 +910,16 @@ function toggleVoiceDictation() {
 }
 
 async function submitOrder() {
-  const svcId = $('#cSvc').value;
+  const svcId = $('#cSvc') ? $('#cSvc').value : chosenSvc;
   const isCustom = svcId === 'mission-speciale';
-  const descVal = $('#cDesc').value;
+  const descVal = $('#cDesc') ? $('#cDesc').value : '';
+  const cName = ($('#cName') ? $('#cName').value.trim() : '') || clientProfile.name || 'Client';
+  const cTel = ($('#cTel') ? $('#cTel').value.trim() : '') || clientProfile.phone || '0708091011';
+  const cAddr = ($('#cAddr') ? $('#cAddr').value.trim() : '') || clientProfile.address || 'Cocody Angré';
+  const cLand = ($('#cLand') ? $('#cLand').value.trim() : '') || clientProfile.landmark || '';
+
+  saveClientProfile({ name: cName, phone: cTel, address: cAddr, landmark: cLand });
+
   const body = {
     service_id: svcId,
     custom_title: isCustom ? (customTitle || 'Mission Spéciale Sur-Mesure') : undefined,
@@ -699,10 +928,10 @@ async function submitOrder() {
     price: isCustom ? computeSmartPrice(customDuration, customEffort, descVal) : undefined,
     budget_vivres: vivresBudget,
     payment_method: paymentMethod,
-    client_name: $('#cName').value,
-    client_phone: $('#cTel').value,
-    address: $('#cAddr').value,
-    landmark: $('#cLand').value,
+    client_name: cName,
+    client_phone: cTel,
+    address: cAddr,
+    landmark: cLand,
     description: descVal,
   };
   
