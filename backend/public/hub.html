@@ -269,33 +269,39 @@ footer {
   <div class="portal-grid">
     <!-- ESPACE CLIENT -->
     <a href="/client" onclick="return selectRole(event, 'client')" class="portal-card client">
+      <div style="height:120px;border-radius:16px;overflow:hidden;margin-bottom:14px;position:relative">
+        <img src="assets/cat-marche.jpg" alt="Client" style="width:100%;height:100%;object-fit:cover">
+        <span style="position:absolute;top:8px;left:8px;background:rgba(6,78,38,0.85);backdrop-filter:blur(4px);color:#fff;font-size:11px;font-weight:800;padding:4px 9px;border-radius:99px">🛍️ Particulier</span>
+      </div>
       <div class="card-top">
-        <div class="card-icon">🛍️</div>
-        <span class="card-tag">Particulier & Entreprise</span>
         <h2>Espace Client</h2>
-        <p>Commandez vos courses au grand marché, ménage, cuisine ou démarches. Suivez votre livreur sur le radar GPS en direct.</p>
+        <p>Commandez vos courses au grand marché, recharge de gaz, ménage ou démarches. Suivi radar GPS en direct.</p>
       </div>
       <div class="card-btn">Commander un Brobrosseur →</div>
     </a>
 
     <!-- ESPACE BROBROSSEUR -->
     <a href="/brobrosseur" onclick="return selectRole(event, 'brobrosseur')" class="portal-card brob">
+      <div style="height:120px;border-radius:16px;overflow:hidden;margin-bottom:14px;position:relative">
+        <img src="assets/hero.jpg" alt="Brobrosseur" style="width:100%;height:100%;object-fit:cover">
+        <span style="position:absolute;top:8px;left:8px;background:rgba(245,163,11,0.9);color:#072111;font-size:11px;font-weight:900;padding:4px 9px;border-radius:99px">🧑‍🔧 Prestataire Agréé</span>
+      </div>
       <div class="card-top">
-        <div class="card-icon">🧑‍🔧</div>
-        <span class="card-tag">Prestataire Agréé</span>
         <h2>Espace Brobrosseur</h2>
-        <p>Recevez vos missions en temps réel, transmettez vos tickets de caisse et encaissez 88 % net sur chaque prestation livrée.</p>
+        <p>Recevez vos missions en direct, transmettez vos tickets et encaissez 88 % net sur chaque prestation livrée.</p>
       </div>
       <div class="card-btn">Ouvrir mon espace livreur →</div>
     </a>
 
     <!-- CONSOLE FONDATEURS -->
     <a href="/admin" onclick="return selectRole(event, 'admin')" class="portal-card admin">
+      <div style="height:120px;border-radius:16px;overflow:hidden;margin-bottom:14px;position:relative;background:linear-gradient(135deg,#0d1c13,#041a0d);display:grid;place-items:center">
+        <img src="assets/logo.jpg" alt="Direction" style="width:64px;height:64px;border-radius:18px;border:2px solid #ffd700;object-fit:cover">
+        <span style="position:absolute;top:8px;left:8px;background:rgba(255,215,0,0.25);border:1px solid #ffd700;color:#ffd700;font-size:11px;font-weight:900;padding:4px 9px;border-radius:99px">👑 Direction</span>
+      </div>
       <div class="card-top">
-        <div class="card-icon">👑</div>
-        <span class="card-tag">Direction & Supervision</span>
         <h2>Console Fondateurs</h2>
-        <p>Gestion de la flotte, validation des certifications CNI, trésorerie et répartition automatique des bénéfices 70/30.</p>
+        <p>Supervision de la flotte, validation des certifications CNI, trésorerie et répartition automatique des bénéfices 70/30.</p>
       </div>
       <div class="card-btn">Accès Privé (Code secret) →</div>
     </a>
