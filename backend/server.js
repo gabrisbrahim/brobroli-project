@@ -243,6 +243,59 @@ function computeSmartMissionPrice(durationMins = 60, effortLevel = 'modere', des
   return Math.max(2500, Math.round(raw / 500) * 500);
 }
 
+/* ───────────── Système de Mérite & Statut Élite (Top 15%) ───────────── */
+function getBrobTier(b) {
+  if (!b) return { tier: 'standard', label: 'Brobrosseur Vérifié', is_elite: false, icon: '🛡️', priority_level: 2 };
+  // Statut Élite : Note >= 4.8 avec 10+ avis, ou certification top_rated / elite_or, ou profil expert démo
+  const isElite = (Number(b.rating) >= 4.8 && (Number(b.ratings_count) || 0) >= 10) ||
+                  (Array.isArray(b.certifications) && (b.certifications.includes('elite_or') || b.certifications.includes('top_rated'))) ||
+                  b.id === 'b-demo';
+  return {
+    tier: isElite ? 'elite' : 'standard',
+    label: isElite ? '🥇 Élite Or (Top 15%)' : '🛡️ Brobrosseur Vérifié',
+    is_elite: isElite,
+    icon: isElite ? '🥇' : '🛡️',
+    priority_level: isElite ? 1 : 2,
+    badge_title: isElite ? '🥇 Prestataire Élite certifié' : '🛡️ Brobrosseur Agréé'
+  };
+}
+
+function findBestBrobrosseur(dest = null, requireElite = false) {
+  const activeBrobs = (db.brobs || []).filter(b => b.active && b.verified);
+  if (!activeBrobs.length) return null;
+
+  // Repérer ceux qui sont déjà engagés dans une mission non terminée
+  const busyBrobIds = new Set(
+    (db.missions || [])
+      .filter(m => ['assigned', 'in_progress', 'delivered'].includes(m.status) && m.brob_id)
+      .map(m => m.brob_id)
+  );
+
+  let candidates = activeBrobs.filter(b => !busyBrobIds.has(b.id));
+  if (!candidates.length) candidates = activeBrobs; // Secours si tous occupés
+
+  // Tri par priorité : Élite d'abord, puis proximité géographique
+  candidates.sort((a, b) => {
+    const tierA = getBrobTier(a);
+    const tierB = getBrobTier(b);
+    if (tierA.priority_level !== tierB.priority_level) {
+      return tierA.priority_level - tierB.priority_level;
+    }
+    if (dest && a.pos && b.pos) {
+      const distA = distM(a.pos.lat, a.pos.lon, dest.lat, dest.lon);
+      const distB = distM(b.pos.lat, b.pos.lon, dest.lat, dest.lon);
+      return distA - distB;
+    }
+    return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+  });
+
+  if (requireElite) {
+    const elite = candidates.find(b => getBrobTier(b).is_elite);
+    if (elite) return elite;
+  }
+  return candidates[0] || null;
+}
+
 /* ───────────── Logique métier ───────────── */
 function createMission(o) {
   const svc = CATALOG.find((s) => s.id === o.service_id) || CATALOG.find((s) => s.id === 'mission-speciale');
@@ -254,23 +307,35 @@ function createMission(o) {
   const commission = Math.round(price * COMMISSION_RATE);
   const budget_vivres = Math.max(0, Math.round(Number(o.budget_vivres) || 0));
   const customLabel = o.custom_title ? `✨ ${clean(o.custom_title, 65)}` : svc.name;
+  const destCoords = o.dest && Number.isFinite(o.dest.lat) && Number.isFinite(o.dest.lon) ? { lat: o.dest.lat, lon: o.dest.lon } : null;
+
+  // Attribution prioritaire : Brobrosseurs Élite (Top 15%) pendant la fenêtre d'exclusivité (45s)
+  const targetBrob = o.brob_id ? db.brobs.find((x) => x.id === o.brob_id) : findBestBrobrosseur(destCoords);
+  const tierInfo = targetBrob ? getBrobTier(targetBrob) : null;
+  const now = Date.now();
+  const priorityWindowMs = 45000; // 45 secondes de priorité d'attribution
+
   const m = {
     id: 'm' + Date.now().toString(36) + crypto.randomBytes(2).toString('hex'),
     ref: 'BR-' + String(++db.counter).padStart(4, '0'),
     service_id: svc.id, service_name: customLabel, icon: isCustom ? '✨' : svc.icon, kind: svc.kind,
     client_name: clean(o.client_name, 80), client_phone: normPhone(o.client_phone),
     address: clean(o.address, 160), landmark: clean(o.landmark, 200), description: clean(o.description, 600),
-    dest: o.dest && Number.isFinite(o.dest.lat) && Number.isFinite(o.dest.lon) ? { lat: o.dest.lat, lon: o.dest.lon } : null,
+    dest: destCoords,
     price, commission, brob_net: price - commission,
     budget_vivres,
     payment_method: clean(o.payment_method, 20) || 'wave',
     chat_messages: [
-      { id: 'c0', sender: 'system', text: `Mission créée · Tarif prestation : ${price} F${budget_vivres > 0 ? ` · Budget vivres : ${budget_vivres} F` : ''}`, at: Date.now() }
+      { id: 'c0', sender: 'system', text: `Mission créée · Tarif prestation : ${price} F${budget_vivres > 0 ? ` · Budget vivres : ${budget_vivres} F` : ''}`, at: now }
     ],
-    brob_id: o.brob_id || null,
-    status: o.brob_id ? 'assigned' : 'pending', step: 0, steps_log: [],
+    brob_id: targetBrob ? targetBrob.id : null,
+    priority_until: now + priorityWindowMs,
+    priority_tier: 'elite',
+    brob_tier: tierInfo ? tierInfo.label : 'Attribution en cours',
+    is_elite: tierInfo ? tierInfo.is_elite : false,
+    status: targetBrob ? 'assigned' : 'pending', step: 0, steps_log: [],
     track: null, trail: [],
-    demo: !!o.demo, sim: !!o.sim, created_at: Date.now(), updated_at: Date.now(),
+    demo: !!o.demo, sim: !!o.sim, created_at: now, updated_at: now,
   };
   db.missions.unshift(m);
   save();
@@ -318,6 +383,8 @@ function applyPosition(b, p) {
 function missionAdminView(m) {
   const b = db.brobs.find((x) => x.id === m.brob_id);
   const t = m.track;
+  const tier = b ? getBrobTier(b) : null;
+  const now = Date.now();
   return {
     id: m.id, ref: m.ref, service_name: m.service_name, icon: m.icon, kind: m.kind,
     client_name: m.client_name, client_phone: m.client_phone, address: m.address, landmark: m.landmark, description: m.description,
@@ -328,7 +395,10 @@ function missionAdminView(m) {
     rating: m.rating, review: m.review, tags: m.tags, rated_at: m.rated_at,
     track: t, trail: m.trail.slice(-150).map((p) => [p[0], p[1]]),
     dist_to_dest: t && m.dest ? distM(t.lat, t.lon, m.dest.lat, m.dest.lon) : null,
-    brob: b ? { id: b.id, name: b.name, phone: b.phone, rating: b.rating, badge: b.badge, last_seen: b.last_seen } : null,
+    brob: b ? { id: b.id, name: b.name, phone: b.phone, rating: b.rating, badge: b.badge, last_seen: b.last_seen, tier } : null,
+    brob_tier: tier ? tier.label : 'Attribution en cours',
+    is_elite: tier ? tier.is_elite : false,
+    priority_countdown: (m.priority_until && m.priority_until > now) ? Math.ceil((m.priority_until - now) / 1000) : 0,
     demo: m.demo, sim: m.sim, created_at: m.created_at, updated_at: m.updated_at,
   };
 }
@@ -424,6 +494,8 @@ function brobMe(b) {
     profile: {
       name: b.name, phone: b.phone, badge: b.badge, rating: b.rating, verified: b.verified,
       matricule: b.matricule || 'CI-BROB-2026-0042',
+      tier: getBrobTier(b),
+      is_elite: getBrobTier(b).is_elite,
       certifications: b.certifications || ['cni', 'casier', 'garant', 'expert_marche', 'top_rated', 'ponctualite'],
       certifications_def: CERTIFICATIONS_DEF,
     },
@@ -441,8 +513,10 @@ async function api(req, res, url, p, method) {
 
   // API PUBLIQUE CLIENT (Particulier qui commande et suit sa course en direct)
   if (method === 'GET' && p === '/api/client/missions') {
+    const now = Date.now();
     const active = db.missions.slice(0, 10).map((m) => {
       const b = db.brobs.find((x) => x.id === m.brob_id);
+      const tier = b ? getBrobTier(b) : null;
       return {
         id: m.id, ref: m.ref, service_name: m.service_name, icon: m.icon, kind: m.kind,
         client_name: m.client_name, client_phone: m.client_phone, address: m.address, landmark: m.landmark, description: m.description,
@@ -453,7 +527,10 @@ async function api(req, res, url, p, method) {
         rating: m.rating, review: m.review, tags: m.tags, rated_at: m.rated_at,
         brob_id: m.brob_id, brob_name: b ? b.name : 'Attribution en cours…',
         brob_phone: b ? b.phone : null,
-        brob_badge: b ? (b.badge || '🏆 Expert Agréé') : 'Vérifié CNI',
+        brob_badge: b ? (b.badge || (tier && tier.is_elite ? '🥇 Élite Or (Top 15%)' : '🏆 Expert Agréé')) : 'Vérifié CNI',
+        brob_tier: tier ? tier.label : 'Attribution en cours…',
+        is_elite: tier ? tier.is_elite : false,
+        priority_window: (m.priority_until && m.priority_until > now) ? Math.ceil((m.priority_until - now) / 1000) : 0,
         brob_rating: b ? (b.rating || 4.9) : 4.9,
         brob_ratings_count: b ? (b.ratings_count || 48) : 48,
         brob_certifications: (b && b.certifications) ? b.certifications.map(cId => CERTIFICATIONS_DEF.find(c => c.id === cId)).filter(Boolean) : [],
@@ -469,11 +546,10 @@ async function api(req, res, url, p, method) {
     const b = await readBody(req, 20000);
     if (!clean(b.client_name)) return send(res, 400, { error: 'Votre nom est requis' });
     if (!clean(b.address)) return send(res, 400, { error: 'Votre quartier / adresse est requis' });
-    const avail = db.brobs.find((x) => x.active && x.verified);
+    const destCoords = b.dest && Number.isFinite(b.dest.lat) && Number.isFinite(b.dest.lon) ? { lat: Number(b.dest.lat), lon: Number(b.dest.lon) } : { lat: 5.3610, lon: -3.9840 };
     const r = createMission({
       ...b,
-      brob_id: avail ? avail.id : null,
-      dest: { lat: 5.3610, lon: -3.9840 },
+      dest: destCoords,
     });
     if (r.error) return send(res, 400, r);
 
@@ -751,6 +827,8 @@ async function adminApi(req, res, url, p, method, s) {
         id: b.id, name: b.name, phone: b.phone, verified: b.verified, active: b.active, demo: !!b.demo,
         badge: b.badge || '🏆 Expert Agréé', rating: b.rating || 4.9, ratings_count: b.ratings_count || 128,
         matricule: b.matricule || `CI-BROB-2026-0042`,
+        tier: getBrobTier(b),
+        is_elite: getBrobTier(b).is_elite,
         certifications: b.certifications || ['cni', 'casier', 'garant', 'expert_marche', 'top_rated', 'ponctualite'],
         last_seen: b.last_seen, online: now - b.last_seen < 90000,
         missions: db.missions.filter((x) => x.brob_id === b.id && x.status === 'completed').length,
